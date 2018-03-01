@@ -43,6 +43,8 @@ git add .
 git commit -m "生成配置文件"
 git push https://gitee.com/xyrlandcom/demo.git master
 
+git push https://gitee.com/xyrlandcom/txt.git master
+git pull https://gitee.com/xyrlandcom/txt.git master
 #从服务器拉回代码
 cd d:/git/
 git pull https://gitee.com/xyrlandcom/demo.git master
