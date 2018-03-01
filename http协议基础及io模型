@@ -1,0 +1,10 @@
+	MIME:Multipurpose Internet Mail Externsion
+	major/minor
+		text/plain
+		image/jpeg
+
+   URL：scheme://server[:]port/path/to/source
+
+   http事物：request<----->response
+   		request
+   		response

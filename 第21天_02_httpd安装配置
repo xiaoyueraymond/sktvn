@@ -1,0 +1,147 @@
+第21天_【02_httpd安装配置】
+
+NCSA研发的软件一款Web服务器,httpd完善后解散团队，解散后的团队继续维护httpd
+充满补丁的服务器 a Pathchy Server = apache
+
+阿帕奇是一个基金会ASF:Apache Software Foundation
+PSF:GNU,GPL
+    web：httpd（是阿帕奇的其中一个项目）
+         tomcat
+         Hadoop（提供高性能运算的框架）
+
+web：http://httpd.apache.org
+httpd:
+	Web Server, Open Source
+	2.2 2.4 2.0(稳定版) 1.3
+
+httpd：
+	事先创建进程
+	按需维持适当的进程
+	模块化设计，核心比较小，各种功能都通过模块添加（包括php）
+		支持运行时配置,支持单独编译模块
+	支持多种方式的虚拟主机配置
+        Socket IP：port
+        虚拟主机：
+        	基于ip的虚拟主机；
+        	基于端口的虚拟主机；
+        	基于域名的虚拟主机；
+
+
+protocol://host:port/path/to/source
+
+    工作机制：
+    	http请求
+      <method><request-url><version>------------------------起始行
+                                    ------------------------空白行
+      <heards>
+
+    	http响应
+      <version><status><reason-phrase>：解释状态码status
+      <heards>：响应报文首部，标明资源类型
+
+      <entity-body>：资源存在，响应报文主体
+
+	GET /download/linux.tar.bz2 HTTP/1.0
+	Host: www.magedu.com
+
+      支持https协议
+      支持用户认证
+      支持基于ip或主机名的ACL
+      支持每目录的访问控制
+      支持URL重写，/image/a.jpeg, /bbs/images/abc.jpeg
+
+
+nginx（反向代理）:
+      多进程响应多用户请求
+      一般用来做反向代理
+
+RedHat：
+    rpm包
+    编译安装
+
+httpd:SElinux(让其处于disabled状态 Permissive)
+
+httpd:
+    /usr/sbin/httpd(MPM:prefork) 事先创建好进程
+          httpd:root root (主导进程)
+          httpd:apache,apache （master进程）
+
+    /etc/rc.d/init.d/httpd
+    Port:(80 /tcp),(ssl:443 /tcp)
+    /etc/httpd:工作的根目录，相当于程序安装目录
+    /etc/httpd/conf: 配置文件目录
+        主要配置文件：httpd.conf
+        /etc/httpd/conf.d/*.conf
+    /etc/httpd/modules:模块目录
+    /etc/httpd/logs --> /var/log/httpd :  日志目录
+            访问日志 :access_log
+            错误日志 ：err_log
+
+    /var/www
+            html 静态页面
+            cgi-bin 动态内容
+
+Web服务器不处理动态内容 
+            cgi：Common Gateway Interface 通用网管接口--一种协议
+            Client --> httpd（index.cgi）-->  Spawn Process（index.cgi）--> httpd --> Client
+            perl,python(需要额外的模块),java,(Servlet,JSP),php
+
+fastcgi：
+动态服务器和静态服务分离，
+         静态服务器一个master--负责接待,交给静态子进程                            动态服务器
+                  生成n个静态子进程 <-------------------（动态请求）---------------------->生成n个动态子进程 
+                  
+
+
+程序：指令和数据
+      数据，数据库服务器
+
+httpd的安装
+      directie value
+      指令不区分字符大小写
+      value则根据需要有可能要区分
+
+
+MPM：多道处理模块
+      mpm_winnt 原生支持线程
+      prefork 预先生成进程       一个请求用一个进程响应
+      worker                     一个请求用一个线程响应  启动多个进程，每个进程生成多个线程      
+      event 基于事件的驱动模型   一个进程处理多个请求   最强大的（nginx）
+
+
+[root@localhost ~]# httpd -l
+Compiled in modules:
+  core.c
+  prefork.c
+  http_core.c
+  mod_so.c
+
+root@localhost ~]# rpm -ql httpd |grep bin
+
+cat /etc/sysconfig/httpd
+
+more /etc/httpd/conf/httpd.conf
+
+<IfModule prefork.c>
+StartServers       8     #服务器启动时启动的进程
+MinSpareServers    5     #最少空闲进程
+MaxSpareServers   20     #最大空闲进程
+ServerLimit      256     #关闭进程后可调整
+MaxClients       256     #最多允许256个请求，后面等待
+MaxRequestsPerChild 4000 
+</IfModule>
+
+<IfModule worker.c>
+StartServers         4   #默认启动进程
+MaxClients         300   #最大线程数
+MinSpareThreads     25   #最少空闲线程
+MaxSpareThreads     75   #最大空闲线程
+ThreadsPerChild     25   #最大子线程数
+MaxRequestsPerChild  0
+</IfModule>
+
+Listen 80  监控当前主机上的所有ip的80端口
+
+21_03_httpd属性配置.mp4
+
+

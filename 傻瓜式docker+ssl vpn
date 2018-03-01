@@ -1,0 +1,45 @@
+
+参考文章https://mobilejazz.com/blog/setting-up-a-vpn-server-in-5-minutes-with-docker/#comments
+
+git clone https://github.com/mobilejazz/docker-ipsec-vpn-server.git
+cd docker-ipsec-vpn-server
+./start.sh
+./adduser.sh john-ipad
+
+./adduser.sh john-ipad
+Shared secret: 9Ea6TYFEzUNxnRFqRiE7khfYFsXKWm
+./adduser.sh john-ipadPassword for user is: mHGaoHoTh9SYfcyPabaJ
+
+./adduser.sh chenweiyuan
+Shared secret: 9Ea6TYFEzUNxnRFqRiE7khfYFsXKWm
+Password for user is: wLpcBqfwCnnko8XvzCHF
+
+客户端配置：https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/docs/clients.md
+
+#进入正在运行的docker
+docker exec -it ipsec-vpn-server /bin/bash
+
+113.98.247.81
+账号 
+chenweiyuan
+预共享秘钥如下
+9Ea6TYFEzUNxnRFqRiE7khfYFsXKWm
+密码wLpcBqfwCnnko8XvzCHF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

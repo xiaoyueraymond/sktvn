@@ -1,0 +1,32 @@
+第29天【Linux集群系统基础、LVS集群基础、lvs类型和调度方法详解、lvs nat和dr类型演示】
+
+Cluster
+	 系统扩展方式：
+	 	scale up： 向上扩展（性价比不高，性能翻一倍，价格翻几倍）
+	 	scale out：向外扩展（集群）
+
+	 集群类型：
+	 	LB：负载均衡集群，Load Balancing
+	 	HA：高可用集群 High Availability
+	 	HP: 高性能集群 High Performancing
+
+	 	分布式存储--大问题切割成小单元，很多个小问题处理完，把结果合起来【映射】
+
+	 	Availability=90%,95%,99%,99.5%,99.9%,99.99%,99.999%
+	 	高可用性
+
+	 系统：
+	 	可扩展性（非线性扩展，内耗）
+	 	可用性
+	 	容量
+	 	性能
+
+	 系统运维：可用 --> 标准化运维 --> 自动化
+
+
+	 构建高可用扩展性系统的原装：
+	 	1.避免串行化和交互
+
+	 GSLB：全局负载均衡 Global Service Load Balancing
+	  SLB: 本地负载均衡 Service Load Balancing
+

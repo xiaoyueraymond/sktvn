@@ -1,0 +1,187 @@
+KVM之扩展虚拟机磁盘容量 – Mr.nong架构师之路
+
+实战【http://www.nongziyi.xin/?p=159】
+
+【实战1：为KVM中的虚拟机cent68-vpn添加一块大小为1G新硬盘】
+1）先查看现在虚拟机有的磁盘
+virsh domblklist cent68-vpn
+
+2）创建一块qcow2的1G虚拟磁盘
+进入存储池/data/images,页面创建vpn68-3.img
+
+3）在线为cent68-vpn添加虚拟磁盘
+virsh attach-disk cent68-vpn /data/images/vpn68-3.img  vdc --cache=none --subdriver=qcow2
+ 
+
+4）再次查看现在虚拟机的磁盘是不是多了一块
+virsh domblklist cent68-vpn
+
+5）打开终端进入cent68-vpn虚拟机查看添加的磁盘情况
+fdisk –l
+ 
+
+6）回宿主机修改虚拟机配置文件添加新增磁盘
+
+1、先查看一下当前虚拟机配置文件，这里看到的配置文件虽然已经有了新增加的磁盘，重启之后会消失，所以主要将新添加的磁盘保存到虚拟机的配置文件中
+virsh dumpxml cent68-vpn
+
+-------------------------------------------------------------------------------------------
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none'/>
+      <source file='/data/images/vpn68-3.img'/>
+      <backingStore/>
+      <target dev='vdc' bus='virtio'/>
+      <alias name='virtio-disk2'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+    </disk>
+------------------------------------------------------------------------------------------
+2、我们把上图中标记出来的内容复制下来，然后编辑虚拟机配置文件进行添加磁盘
+virsh edit cent68-vpn
+
+-------------------------------------------------------------------------------------------
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none'/>
+      <source file='/data/images/vpn68-3.img'/>
+      <backingStore/>
+      <target dev='vdc' bus='virtio'/>
+      <alias name='virtio-disk2'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+    </disk>
+------------------------------------------------------------------------------------------
+
+7）到虚拟机cent68-vpn中对磁盘进行分区
+
+1、我们先查看现磁盘大小
+df –hT
+2.格式化磁盘
+mkfs.ext4 /dev/vdc
+3.创建目录，挂载硬盘
+mkdir /data1
+mount /dev/vdc /data1
+4.查看UUID
+blkid /dev/vdc
+/dev/vdc: UUID="7ddca6b9-2e01-4cb0-b2e0-68e72adcb1b5" TYPE="ext4" 
+5.修改挂载文件
+vi /etc/fstab
+UUID=7ddca6b9-2e01-4cb0-b2e0-68e72adcb1b5 /data1              ext4    defaults        0 0
+6.重启虚拟机cent68-vpn
+
+【实战2：为KVM中的虚拟机cent68-vpn逻辑卷/dev/mapper/VolGroup-lv_root 扩容】
+
+1）先查看现在虚拟机有的磁盘
+virsh domblklist cent68-vpn
+
+2）创建一块qcow2的1G虚拟磁盘
+进入存储池/data/images,页面创建vpn68-4.img
+
+3）在线为cent68-vpn添加虚拟磁盘
+virsh attach-disk cent68-vpn /data/images/vpn68-4.img  vdd --cache=none --subdriver=qcow2
+ 
+
+4）再次查看现在虚拟机的磁盘是不是多了一块
+virsh domblklist cent68-vpn
+
+
+5）打开终端进入cent68-vpn虚拟机查看添加的磁盘情况
+fdisk –l
+
+6）回宿主机修改虚拟机配置文件添加新增磁盘
+
+1、先查看一下当前虚拟机配置文件，这里看到的配置文件虽然已经有了新增加的磁盘，重启之后会消失，所以主要将新添加的磁盘保存到虚拟机的配置文件中
+virsh dumpxml cent68-vpn
+
+-------------------------------------------------------------------------------------------
+<disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none'/>
+      <source file='/data/images/vpn68-4.img'/>
+      <backingStore/>
+      <target dev='vdd' bus='virtio'/>
+      <alias name='virtio-disk3'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
+    </disk>
+
+------------------------------------------------------------------------------------------
+2、我们把上图中标记出来的内容复制下来，然后编辑虚拟机配置文件进行添加磁盘
+virsh edit cent68-vpn
+
+-------------------------------------------------------------------------------------------
+<disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none'/>
+      <source file='/data/images/vpn68-4.img'/>
+      <backingStore/>
+      <target dev='vdd' bus='virtio'/>
+      <alias name='virtio-disk3'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
+    </disk>
+------------------------------------------------------------------------------------------
+
+7）到虚拟机cent68-vpn中对磁盘进行分区
+
+1、我们先查看现磁盘大小
+df –hT
+
+2.格式化磁盘
+mkfs.ext4 /dev/vdd
+
+【扩展LV逻辑卷http://lzw.me/a/linux-lvm.html】
+【分区，硬盘】  →  【物理卷PV】→ 【卷组VG】  → 【逻辑卷LV】 
+3、显示物理卷
+pvs
+
+[root@localhost ~]# pvs
+  PV         VG       Fmt  Attr PSize  PFree
+  /dev/vda2  VolGroup lvm2 a--u 39.51g    0 
+
+
+5、查看卷组vgs
+[root@localhost ~]# vgs
+  VG       #PV #LV #SN Attr   VSize  VFree
+  VolGroup   1   2   0 wz--n- 39.51g    0 
+
+6、创建物理卷
+ pvcreate /dev/vdd 
+
+7.加入卷组
+vgextend VolGroup /dev/vdd
+
+8.扩展逻辑卷
+ lvextend -L +8G /dev/mapper/VolGroup-lv_root
+
+11、挂载
+mount
+ 
+12、重新识别硬盘
+
+resize2fs /dev/mapper/VolGroup-lv_root
+
+13、查看硬盘使用情况可以看到/目录已经扩容
+
+df –hT
+----------------------------------------------------------------------------------------
+[root@localhost ~]# df -h
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup-lv_root
+                       35G  731M   33G   3% /
+tmpfs                 915M     0  915M   0% /dev/shm
+/dev/vda1             477M   28M  425M   7% /boot
+/dev/vdb              976M  1.3M  924M   1% /data
+/dev/vdc              9.8G   23M  9.2G   1% /data1
+[root@localhost ~]# resize2fs /dev/mapper/VolGroup-lv_root
+resize2fs 1.41.12 (17-May-2010)
+Filesystem at /dev/mapper/VolGroup-lv_root is mounted on /; on-line resizing required
+old desc_blocks = 3, new_desc_blocks = 3
+Performing an on-line resize of /dev/mapper/VolGroup-lv_root to 11445248 (4k) blocks.
+The filesystem on /dev/mapper/VolGroup-lv_root is now 11445248 blocks long.
+
+[root@localhost ~]# df -h
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup-lv_root
+                       43G  735M   40G   2% /
+tmpfs                 915M     0  915M   0% /dev/shm
+/dev/vda1             477M   28M  425M   7% /boot
+/dev/vdb              976M  1.3M  924M   1% /data
+/dev/vdc              9.8G   23M  9.2G   1% /data1
+[root@localhost ~]# 
+
+
+----------------------------------------------------------------------------------------

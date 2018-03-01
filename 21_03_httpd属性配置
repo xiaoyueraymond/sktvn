@@ -1,0 +1,75 @@
+21_03_httpd属性配置
+
+[root@localhost ~]# cd /etc/httpd/conf
+[root@localhost conf]# ls
+httpd.conf  magic
+
+[root@localhost conf]# grep 'Section' httpd.conf
+### Section 1: Global Environment
+### Section 2: 'Main' server configuration    ----只有一个web服务器，不提供中心主机
+### Section 3: Virtual Hosts                  ----禁用中心主机，提供多个站点
+[root@localhost conf]# 
+
+ServerAdmin 管理员
+ 
+ServerName www.example.com:80
+
+DocumentRoot "/var/www/html" 文档目录
+
+mkdir /web/html -pv
+URL路径跟本地文件系统路径不是一码事儿，URL是相对于DocumentRoot的路径而言的。
+
+Options
+	None：不支持任何选项
+	Indexes：允许索引目录
+	FollowSymLinks：允许链接到指向的原文件
+	Includes:允许执行服务端包含（SSI）
+	ExecCGI：允许执行CGI脚本
+	Mu：根据根据操作系统显示不同语言的默认页
+	ALL：支持所有选项
+
+
+------------a.html--------------
+
+<html>
+<head>
+<title>简单html页面</title>
+</head>
+<body>
+<h1>这是一个简单的html页面</h1>
+</bod>
+</html>
+--------------------------------
+
+<Directory "/var/www./html"> 定义 /var/www./html的网络路径
+
+vim /etc/httpd/conf/htpd.conf
+
+Options Indexes FollowSymLinks 根目录的缩影 可以用来做目录
+		1.移除欢迎页面
+		2.设置Options Indexes FollowSymLinks 如果不显示则改为  Options FollowSymLinks
+
+	
+
+【Apache学习】linux文件目录以网页列表形式访问 → http://blog.51cto.com/adelazhu/1681512
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
