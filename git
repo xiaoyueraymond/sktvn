@@ -1,3 +1,10 @@
+#保存代码
+git add .
+git commit -m "update"
+git push -u origin master
+git push -u git master
+
+
 cd /c/users/125C01062801/Desktop/learn/马哥linux
 git add .
 git commit -m "update"

@@ -452,7 +452,7 @@ Debian系列
 			1
 			上传成功（因为是国外网站，可能速度比较慢，耐心等待。。。）
 
-		【多个仓库时，如何推送到本地仓库？还是远程仓库？
+		【多个仓库时，如何推送到本地仓库？还是远程仓库？】
 
 章节4 课时3 构建镜像
 		
@@ -460,7 +460,20 @@ Debian系列
 		保存对容器的修改，并再次使用
 		自定义镜像的能力		以软件的形式打包并分发服务器及运行环境
 
-	docker commit 通过容器构建
+	【docker commit 通过容器构建】
 		-a 作者
 		-m 提示信息
 		-p  不暂停容器
+
+    【测试步骤】
+    	1.跑ubuntu镜像
+    			docker run -it -p 80 --name cm2 dc4491992653  /bin/bash
+    	2.安装nginx
+    			apt-get install -y nginx
+    	3.生成镜像 
+    			 docker commit -a="zhenghangzhou" -m="nginx"  b8bc5c547951 ubuntu-nginx
+    			 容器id（名字）  +  新镜像名称
+    	4.查看镜像
+    			[root@localhost ~]# docker images
+				REPOSITORY                               TAG                 IMAGE ID            CREATED              SIZE
+				ubuntu-nginx                             latest              30c507487790        About a minute ago   264 MB
