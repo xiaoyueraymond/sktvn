@@ -142,6 +142,5 @@ MaxRequestsPerChild  0
 
 Listen 80  监控当前主机上的所有ip的80端口
 
-21_03_httpd属性配置.mp4
 
 

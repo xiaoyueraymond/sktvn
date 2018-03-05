@@ -1,5 +1,7 @@
-/c/users/125C01062801/Desktop/learn/马哥linux
-
+cd /c/users/125C01062801/Desktop/learn/马哥linux
+git add .
+git commit -m "update"
+git push -u origin master
 
 #https://git-scm.com/download/win
 git config --global user.name Monika
@@ -119,3 +121,6 @@ hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 
 网上搜索了下，是因为远程repository和我本地的repository冲突导致的，而我在创建版本库后，在github的版本库页面点击了创建README.md文件的按钮创建了说明文档，但是却没有pull到本地。这样就产生了版本冲突的问题。
 ---------------------------------------------------------------------------------
+
+
+
