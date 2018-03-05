@@ -109,7 +109,7 @@ http://www.php.cn/code/8786.html
 章节1 第四课时
 	【docker容器技术相关】
 
-	Namespaces 命名空间
+	【Namespaces 命名空间】
 			编程语言
 				封装 → 代码隔离
 			操作系统
@@ -122,133 +122,133 @@ http://www.php.cn/code/8786.html
 		Mount 					   管理挂载点
 		Unix Timesharing System    隔离内核和版本表示
 
-	Control groups 控制组          --谷歌工程师开发
+	【Control groups 控制组】         --谷歌工程师开发
 		资源限制
 		优先级设定
 		资源计量
 		资源控制
 
-	Docker容器的能力
+	【Docker容器的能力】
 		文件系统隔离：每个容器都哟自己的root文件系统
 		进程隔离：每个容器都运行在自己的进程环境中
 		网络隔离：容器间的虚拟网络接口和ip地址都是分开的
 		资源隔离和分组：使用cgroups将CPU和内存之类的资源独立分配给docker容器
 
-	章节2 docker安装
-		ubuntu中安装docker
-		windows中安装docker
-		maxOS中安装docker
+章节2 docker安装
+	ubuntu中安装docker
+	windows中安装docker
+	maxOS中安装docker
 
 章节3  第一课时docker容器
 
 	【容器基本命令】
 
-	#一次性启动容器输出hello world
+	【一次性启动容器输出hello world
 	docker run learn/tutorial echo "hello world"
 
-	#启动容器
+	【启动容器】
 		docker run IMAGE[COMMAND][ARG]
 
-	#启动交互式容器
+	【启动交互式容器】
 		docker run -i -t IMAGE /bin/bash
 		-i  告诉守护进程始终打开标准输入
 		-t  分配伪tty终端
 
-	[root@localhost ~]# docker run -i -t learn/tutorial /bin/bash
-	root@6ba97689969e:/# ps -ef 
-	UID        PID  PPID  C STIME TTY          TIME CMD
-	root         1     0  2 03:38 ?        00:00:00 /bin/bash
-	root         9     1  0 03:38 ?        00:00:00 ps -ef
-	root@6ba97689969e:/# exit
-	exit
-	[root@localhost ~]# 
+		[root@localhost ~]# docker run -i -t learn/tutorial /bin/bash
+		root@6ba97689969e:/# ps -ef 
+		UID        PID  PPID  C STIME TTY          TIME CMD
+		root         1     0  2 03:38 ?        00:00:00 /bin/bash
+		root         9     1  0 03:38 ?        00:00:00 ps -ef
+		root@6ba97689969e:/# exit
+		exit
+		[root@localhost ~]# 
 
-	#查看容器
-	docker ps -a -l
-	           不加参数表示正在运行的容器
-	  		-a 查看存在过的所有容器
-	  		-l 最新创建的一个容器
+	【查看容器】
+		docker ps -a -l
+		           不加参数表示正在运行的容器
+		  		-a 查看存在过的所有容器
+		  		-l 最新创建的一个容器
 
-	[root@localhost ~]# docker ps -a
-	CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES
-	6ba97689969e        learn/tutorial      "/bin/bash"              2 minutes ago       Exited (0) 51 seconds ago                       hopeful_goldwasser
-	286dbbb406a1        learn/tutorial      "echo 'hello world'"     4 minutes ago       Exited (0) 4 minutes ago                        jolly_lichterman
-	cf02015db680        learn/tutorial      "/bin/bash"              17 minutes ago      Exited (0) 16 minutes ago                       angry_roentgen
-	46dcc1f08734        learn/ping          "ping www.google.com"    19 hours ago        Exited (0) 19 hours ago                         boring_jones
-	143ea159b71e        learn/tutorial      "apt-get install -y p"   19 hours ago        Exited (0) 19 hours ago                         mad_kilby
-	865a5e3c4bed        learn/tutorial      "echo 'hello docker'"    19 hours ago        Exited (0) 19 hours ago                         infallible_ptolemy
-	bd79d8c0ee68        hello-world         "/hello"                 19 hours ago        Exited (0) 19 hours ago                         nauseous_visvesvaraya
-	[root@localhost ~]# 
+				[root@localhost ~]# docker ps -a
+				CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES
+				6ba97689969e        learn/tutorial      "/bin/bash"              2 minutes ago       Exited (0) 51 seconds ago                       hopeful_goldwasser
+				286dbbb406a1        learn/tutorial      "echo 'hello world'"     4 minutes ago       Exited (0) 4 minutes ago                        jolly_lichterman
+				cf02015db680        learn/tutorial      "/bin/bash"              17 minutes ago      Exited (0) 16 minutes ago                       angry_roentgen
+				46dcc1f08734        learn/ping          "ping www.google.com"    19 hours ago        Exited (0) 19 hours ago                         boring_jones
+				143ea159b71e        learn/tutorial      "apt-get install -y p"   19 hours ago        Exited (0) 19 hours ago                         mad_kilby
+				865a5e3c4bed        learn/tutorial      "echo 'hello docker'"    19 hours ago        Exited (0) 19 hours ago                         infallible_ptolemy
+				bd79d8c0ee68        hello-world         "/hello"                 19 hours ago        Exited (0) 19 hours ago                         nauseous_visvesvaraya
+				[root@localhost ~]# 
 
-	docker inspect +id 或者 名字
-	docker inspect 6ba97689969e  
+				docker inspect +id 或者 名字
+				docker inspect 6ba97689969e  
 
-	#自定义容器名字
+	【自定义容器名字】
 		docker run --name=zhz -i -t learn/tutorial /bin/bash
 		docker inspect zhz
 
-	#重启启动停止的容器
-	[root@localhost ~]# docker ps
-	CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-	[root@localhost ~]# docker start zhz
-	zhz
-	[root@localhost ~]# docker ps
-	CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-	c43f403cd34f        learn/tutorial      "/bin/bash"         2 minutes ago       Up 3 seconds                            zhz
-	[root@localhost ~]# 
+	【重启启动停止的容器】
+			[root@localhost ~]# docker ps
+			CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+			[root@localhost ~]# docker start zhz
+			zhz
+			[root@localhost ~]# docker ps
+			CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+			c43f403cd34f        learn/tutorial      "/bin/bash"         2 minutes ago       Up 3 seconds                            zhz
+			[root@localhost ~]# 
 
 
-	#删除停止的容器
-	docker rm bd79d8c0ee68 
+	【删除停止的容器】
+			docker rm bd79d8c0ee68 
 
-	[root@localhost ~]# docker ps -a
-	CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES
-	c43f403cd34f        learn/tutorial      "/bin/bash"              9 minutes ago       Up 7 minutes                                    zhz
-	6ba97689969e        learn/tutorial      "/bin/bash"              16 minutes ago      Exited (0) 14 minutes ago                       hopeful_goldwasser
-	286dbbb406a1        learn/tutorial      "echo 'hello world'"     18 minutes ago      Exited (0) 18 minutes ago                       jolly_lichterman
-	cf02015db680        learn/tutorial      "/bin/bash"              30 minutes ago      Exited (0) 30 minutes ago                       angry_roentgen
-	46dcc1f08734        learn/ping          "ping www.google.com"    19 hours ago        Exited (0) 19 hours ago                         boring_jones
-	143ea159b71e        learn/tutorial      "apt-get install -y p"   19 hours ago        Exited (0) 19 hours ago                         mad_kilby
-	865a5e3c4bed        learn/tutorial      "echo 'hello docker'"    19 hours ago        Exited (0) 19 hours ago                         infallible_ptolemy
-	bd79d8c0ee68        hello-world         "/hello"                 20 hours ago        Exited (0) 20 hours ago                         nauseous_visvesvaraya
-	[root@localhost ~]# docker rm bd79d8c0ee68
-	bd79d8c0ee68
-	[root@localhost ~]# docker ps -a
-	CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES
-	c43f403cd34f        learn/tutorial      "/bin/bash"              9 minutes ago       Up 7 minutes                                    zhz
-	6ba97689969e        learn/tutorial      "/bin/bash"              16 minutes ago      Exited (0) 14 minutes ago                       hopeful_goldwasser
-	286dbbb406a1        learn/tutorial      "echo 'hello world'"     18 minutes ago      Exited (0) 18 minutes ago                       jolly_lichterman
-	cf02015db680        learn/tutorial      "/bin/bash"              30 minutes ago      Exited (0) 30 minutes ago                       angry_roentgen
-	46dcc1f08734        learn/ping          "ping www.google.com"    19 hours ago        Exited (0) 19 hours ago                         boring_jones
-	143ea159b71e        learn/tutorial      "apt-get install -y p"   19 hours ago        Exited (0) 19 hours ago                         mad_kilby
-	865a5e3c4bed        learn/tutorial      "echo 'hello docker'"    19 hours ago        Exited (0) 19 hours ago                         infallible_ptolemy
-	[root@localhost ~]# 
+			[root@localhost ~]# docker ps -a
+			CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES
+			c43f403cd34f        learn/tutorial      "/bin/bash"              9 minutes ago       Up 7 minutes                                    zhz
+			6ba97689969e        learn/tutorial      "/bin/bash"              16 minutes ago      Exited (0) 14 minutes ago                       hopeful_goldwasser
+			286dbbb406a1        learn/tutorial      "echo 'hello world'"     18 minutes ago      Exited (0) 18 minutes ago                       jolly_lichterman
+			cf02015db680        learn/tutorial      "/bin/bash"              30 minutes ago      Exited (0) 30 minutes ago                       angry_roentgen
+			46dcc1f08734        learn/ping          "ping www.google.com"    19 hours ago        Exited (0) 19 hours ago                         boring_jones
+			143ea159b71e        learn/tutorial      "apt-get install -y p"   19 hours ago        Exited (0) 19 hours ago                         mad_kilby
+			865a5e3c4bed        learn/tutorial      "echo 'hello docker'"    19 hours ago        Exited (0) 19 hours ago                         infallible_ptolemy
+			bd79d8c0ee68        hello-world         "/hello"                 20 hours ago        Exited (0) 20 hours ago                         nauseous_visvesvaraya
+			[root@localhost ~]# docker rm bd79d8c0ee68
+			bd79d8c0ee68
+			[root@localhost ~]# docker ps -a
+			CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES
+			c43f403cd34f        learn/tutorial      "/bin/bash"              9 minutes ago       Up 7 minutes                                    zhz
+			6ba97689969e        learn/tutorial      "/bin/bash"              16 minutes ago      Exited (0) 14 minutes ago                       hopeful_goldwasser
+			286dbbb406a1        learn/tutorial      "echo 'hello world'"     18 minutes ago      Exited (0) 18 minutes ago                       jolly_lichterman
+			cf02015db680        learn/tutorial      "/bin/bash"              30 minutes ago      Exited (0) 30 minutes ago                       angry_roentgen
+			46dcc1f08734        learn/ping          "ping www.google.com"    19 hours ago        Exited (0) 19 hours ago                         boring_jones
+			143ea159b71e        learn/tutorial      "apt-get install -y p"   19 hours ago        Exited (0) 19 hours ago                         mad_kilby
+			865a5e3c4bed        learn/tutorial      "echo 'hello docker'"    19 hours ago        Exited (0) 19 hours ago                         infallible_ptolemy
+			[root@localhost ~]# 
 
 
 
-章节3  第二课时守护式容器
+章节3 课时2守护式容器】
 				能够长期运行
 				没有交互式会话
 				非常适合应用程序和服务
 
-已守护形式运行容器
-		docker run -i -t 容器名 /bin/bash
-        按ctrl + q  Ctrl + Q
+	【已守护形式运行容器】
+			docker run -i -t 容器名 /bin/bash
+	        按ctrl + q  Ctrl + Q
 
-附加到运行中的容器
-		docker attach 容器名
+	【附加到运行中的容器】
+			docker attach 容器名
 
-启动守护式容器
-		docker run -d 
+	【启动守护式容器】
+			docker run -d 
 
-docker  run -d  --name dc3 learn/tutorial /bin/sh -c "while true;do echo hello world;sleep 10;done"
+			docker  run -d  --name dc3 learn/tutorial /bin/sh -c "while true;do echo hello world;sleep 10;done"
 
-查看容器日志
-		docker logs [-f] [-t] [--tail] 容器名
-		-f  		一直跟踪变化并返回结果
-		-t  		结果返回时间搓
-		--tail 		返回结尾处多少数量的日志
-					无参数表示所有日志
+			查看容器日志
+					docker logs [-f] [-t] [--tail] 容器名
+					-f  		一直跟踪变化并返回结果
+					-t  		结果返回时间搓
+					--tail 		返回结尾处多少数量的日志
+								无参数表示所有日志
 
 -----------------------------------------------------
 docker pull haitun/httpd-php53w
@@ -297,14 +297,16 @@ docker push nginx-php56w00
 
 ******************************************************************************************************************
 
-在运行中的容器内启动新的进程
+
+	【在运行中的容器内启动新的进程】
 		$docker exec [-d][-i][-t] 容器名 [command] [arg]
 		-d
 		-i
 		-t
 
 
-停止守护式容器
+
+	【停止守护式容器】
 		docker stop 容器名   ------------普通关机
 		docker kill 容器名   ------------强制关机
 
@@ -313,30 +315,31 @@ docker push nginx-php56w00
 章节3 第四课时【在容器中部署静态网站】
 
 
-设置容器的端口映射
-	-P 为所有端口进行映射
-		-P --publish-all true|false 默认为false
-			docker run -P -i -t ubuntu/bin/bash
 
-	-p 指定映射的端口
-		-p,--publish=[]
-		containerPort 指定容器端口宿主机的端口随机映射
-			docker run -p 80 -i -t ubuntu /bin/bash          
-		hostPort:containerPort 宿主机和容器端口一一对应
-			docker run -p 8080:80 -i -t ubuntu /bin/bash      
-		ip::containerPort    指定ip和容器端口
-			docker run -p 0.0.0.0:80 -i -t unbuntu /bin/bash  ip+容器端口
-		ip:hostPort:containerPort  正定ip和宿主机端口和容器端口
-			docker run -p 0.0.0.0:8080:80 -i -t unbuntu /bin/bash 
+	【设置容器的端口映射】
+		-P 为所有端口进行映射
+			-P --publish-all true|false 默认为false
+				docker run -P -i -t ubuntu/bin/bash
+
+		-p 指定映射的端口】
+			-p,--publish=[]
+			containerPort 指定容器端口宿主机的端口随机映射
+				docker run -p 80 -i -t ubuntu /bin/bash          
+			hostPort:containerPort 宿主机和容器端口一一对应
+				docker run -p 8080:80 -i -t ubuntu /bin/bash      
+			ip::containerPort    指定ip和容器端口
+				docker run -p 0.0.0.0:80 -i -t unbuntu /bin/bash  ip+容器端口
+			ip:hostPort:containerPort  正定ip和宿主机端口和容器端口
+				docker run -p 0.0.0.0:8080:80 -i -t unbuntu /bin/bash 
 
 
-步骤：1.创建映射80端口的交互式容器
-	  2.安装nginx
-	  3.安装文本编辑器vim
-	  4.创建静态页面
-	  5.修改nginx配置文件
-	  6.运行nginx
-	  7.验证网站访问
+		步骤：1.创建映射80端口的交互式容器
+			  2.安装nginx
+			  3.安装文本编辑器vim
+			  4.创建静态页面
+			  5.修改nginx配置文件
+			  6.运行nginx
+			  7.验证网站访问
 
 ----------------------------------------------------------------------------------
 yum和apt-get的区别
@@ -365,48 +368,48 @@ Debian系列
 				rootfs（Ubuntu）只读状态 --基础镜像
 				bootfs
 
-	docker -info
-	#查看镜像列表
+		docker -info
+	【查看镜像列表】
 		docker images [options] [repository]
 			-a --al=false
 			-f fillter        过滤
 			--no-trunc=false  不使用截断镜像image id
 			-q,--quiet=false  只显示镜像id
 
-	·REPOSITORY 仓库
+	【·REPOSITORY 仓库】
 		REGISTRY 仓库
 
-    ·TAG
-    为同样的镜像根据不同的需求打上不同的标签
+    【·TAG】
+    	为同样的镜像根据不同的需求打上不同的标签
 
-     docker images --no-trunc
+     	docker images --no-trunc
 
-     [root@localhost docker]# docker images --no-trunc
-	REPOSITORY                               TAG                 IMAGE ID                                                                  CREATED             SIZE
-	113.98.247.82:5000/nginx                 latest              sha256:c6c4f6e141375a10a19ebca064c66e59d367d628eca59de19e1b3980512
+	     [root@localhost docker]# docker images --no-trunc
+		REPOSITORY                               TAG                 IMAGE ID                                                                  CREATED             SIZE
+		113.98.247.82:5000/nginx                 latest              sha256:c6c4f6e141375a10a19ebca064c66e59d367d628eca59de19e1b3980512
 
-    docker images 仓库名
+	    docker images 仓库名
 
-    [root@localhost ~]# docker images 113.98.247.82:5000/nginx
-	REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE
-	113.98.247.82:5000/nginx   latest              c6c4f6e14137        23 hours ago        724.6 MB
-	[root@localhost ~]# 
+	    [root@localhost ~]# docker images 113.98.247.82:5000/nginx
+		REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE
+		113.98.247.82:5000/nginx   latest              c6c4f6e14137        23 hours ago        724.6 MB
+		[root@localhost ~]# 
 
-	查看镜像的详细信息
+	【查看镜像的详细信息】
 		docker inspect [options] container | image 
 
-	 删除镜像
-	 	docker rmi 
-	 		-f.--force=false
-	 		--no-prune=false
+	 【删除镜像】
+		 	docker rmi 
+		 		-f.--force=false
+		 		--no-prune=false
 
-	  docker rmi ubuntu:14.04
-	  docker rmi +镜像ID
-	  docker rmi $(docker iamges -q)
+			  docker rmi ubuntu:14.04
+			  docker rmi +镜像ID
+			  docker rmi $(docker iamges -q)
 
 章节4 课时2 获取和推送镜像
 
-		查找镜像
+		【查找镜像】
 			docker hub
 				registry.hub.docker.con 在网页中查找
 
@@ -416,7 +419,7 @@ Debian系列
 				--no-trunc 不截断
 				-s 星级
 
-		拉取镜像
+		【拉取镜像】
 			docker pull
 				-a，所有
 
@@ -427,7 +430,7 @@ Debian系列
              	添加 DOCKER_OPTS="--registry-mirro=http://MIRROR-ADDR"
              	sudo docker restart
 
-		推送镜像【http://blog.csdn.net/mr_sunrise/article/details/75146869】
+		【推送镜像【http://blog.csdn.net/mr_sunrise/article/details/75146869】】
             
 			填写好name,点击create即创建成功镜像仓库 
 			开始上传： 
@@ -449,13 +452,15 @@ Debian系列
 			1
 			上传成功（因为是国外网站，可能速度比较慢，耐心等待。。。）
 
-	#多个仓库时，如何推送到本地仓库？还是远程仓库？
+		【多个仓库时，如何推送到本地仓库？还是远程仓库？
 
 章节4 课时3 构建镜像
 		
 
 		保存对容器的修改，并再次使用
-		自定义镜像的能力
-		以软件的形式打包并分发服务器及运行环境
+		自定义镜像的能力		以软件的形式打包并分发服务器及运行环境
 
 	docker commit 通过容器构建
+		-a 作者
+		-m 提示信息
+		-p  不暂停容器

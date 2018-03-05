@@ -3,6 +3,14 @@ git add .
 git commit -m "update"
 git push -u origin master
 
+
+添加远程仓库
+https://github.com/xiaoyueraymond/test1.git
+git add remote git https://gitee.com/xyrlandcom/demo.git
+git add .
+git commit -m "update"
+git push -u git master
+
 #https://git-scm.com/download/win
 git config --global user.name Monika
 git config --global user.email xyrland@163.com
