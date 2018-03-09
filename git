@@ -1,8 +1,17 @@
 #保存代码
+#安装Git-2.16.2-64-bit.exe （git不是内部命令）
+#安装GitHubDesktopSetup
 git add .
 git commit -m "update"
 git push -u origin master
 git push -u git master
+
+
+C:\Users\125C01062801\Desktop\learn\马哥linux>git remote -v
+git     https://github.com/xiaoyueraymond/sktvn.git (fetch)
+git     https://github.com/xiaoyueraymond/sktvn.git (push)
+origin  https://gitee.com/xyrlandcom/txt.git (fetch)
+origin  https://gitee.com/xyrlandcom/txt.git (push)
 
 
 cd /c/users/125C01062801/Desktop/learn/马哥linux

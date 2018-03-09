@@ -240,6 +240,7 @@ http://www.php.cn/code/8786.html
 
 	【启动守护式容器】
 			docker run -d 
+				容器将会运行在后台模式
 
 			docker  run -d  --name dc3 learn/tutorial /bin/sh -c "while true;do echo hello world;sleep 10;done"
 
@@ -461,9 +462,9 @@ Debian系列
 		自定义镜像的能力		以软件的形式打包并分发服务器及运行环境
 
 	【docker commit 通过容器构建】
-		-a 作者
-		-m 提示信息
-		-p  不暂停容器
+			-a 作者
+			-m 提示信息
+			-p  不暂停容器
 
     【测试步骤】
     	1.跑ubuntu镜像
@@ -472,8 +473,37 @@ Debian系列
     			apt-get install -y nginx
     	3.生成镜像 
     			 docker commit -a="zhenghangzhou" -m="nginx"  b8bc5c547951 ubuntu-nginx
-    			 容器id（名字）  +  新镜像名称
+    			                                             容器id（名字）  +  新镜像名称
     	4.查看镜像
     			[root@localhost ~]# docker images
 				REPOSITORY                               TAG                 IMAGE ID            CREATED              SIZE
 				ubuntu-nginx                             latest              30c507487790        About a minute ago   264 MB
+        5.测试运行镜像
+        		docker run -d --name web1 -p 80 ubuntu-nginx nginx -g "daemon off;" 
+        		docker ps
+        		curl 127.0.0.1:32770
+
+     【使用dockerfile构建镜像】
+     	 1.创建dockerfile
+     	 	#First Dockerfile
+     	 		FROM ubuntu:14.04
+     	 		MAINTAINER dormancypress "xyrland@163.com"
+     	 		RUN apt-get update
+     	 		RUN apt-get install -y nginx
+     	 		EXPOSE 80
+
+     	 2.创建目录，进入目录 
+	     	    #mkdir -p 参数P代表parents,表示递归创建目录
+	     	 	mkdir -p dockerfile
+	     	 	cd dockerfile
+	     	 	vim Dockerfile
+	     	 	#-t 指定镜像名字 .表示当前目录里面有Dockerfile
+	     	 	docker build -t='dockerfile' . 
+	     	 	#查看镜像
+	     	 	docker iamges
+
+     	 3.测试运行镜像
+     	    	# -d 后台运行 --name 容器名 -p映射端口  （ubuntu-nginx）镜像名字  nginx -g "daemon off;"程序
+     	    	docker run -d --name web2 -p 80 ubuntu-nginx nginx -g "daemon off;"
+        		docker ps
+        		curl 127.0.0.1:32770

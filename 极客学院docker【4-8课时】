@@ -1,0 +1,467 @@
+极客学院docker【4-8课时】
+
+章节5 课时1
+
+     USER <->  docker cli客户端  -> 命令  docker守护进程
+                        clien    <- 结果      service
+
+	【docker 客户端与守护进程】
+		#查看docker进程
+		ps -ef | grep docker
+		#查看api的版本
+		docker version
+		#api交互模式
+		nc -U /var/run/docker.sock
+	    GET /info HTTP/1.1
+
+章节5 课时2
+	【docker 守护进程的配置和操作】
+		#查看docker进程
+		sudo status docker
+		#docker 启动 停止 重启
+		sudo service docker stop
+		sudo service docker start
+		sudo service docker restart
+
+        #docker 守护进程的启动选项
+        	运行相关 docker目录 进程id 日志级别 写入文件地址 debug模式开启
+        	与服务器连接相关 安全性相关 用户组 主机
+        	Remote API
+          	存储相关
+          	Registry
+          	网络设置相关 网桥 DNS
+
+
+		#守护形式
+		docker -d
+
+		启动配置文件
+		/etc/default/docker
+
+章节5 课时3 
+	【docker 远程访问】
+		1.第一台docker服务器【10.100.13.115】第二台docker客户端【10.100.13.118】
+		2.【10.100.13.115】修改docker启动项
+		    vim /etc/sysconfig/docker
+			OPTIONS='-H tcp://0.0.0.0:2375  --label name=zhenghangzhou --selinux-enabled --log-driver=journald --signature-verification=false --insecure-registry 113.98.247.82:5000'
+
+			ps -ef | grep docker
+
+
+		3.保存C/S API版本一致 
+			docker info
+
+		4.【10.100.13.118】在client 中测试
+			[root@localhost ~]# curl http://10.100.13.115:2375/info
+    
+           【10.100.13.118】使用客户端命令选项
+           		docker -H tcp://10.100.13.115:2375 info
+
+           	【10.100.13.118】设定永久
+           		export DOCKER_HOST="tcp://10.100.13.115:2375"
+           		docker info
+
+           	【10.100.13.118】访问本地docker服务器
+           		export DOCKER_HOST=""
+           		docker info  
+
+         5.【10.100.13.115】在服务器上添加
+                vim /etc/sysconfig/docker
+                #本机通过unix的方式访问本机服务器
+                OPTIONS='-H unix:///var/run/docker.sock'
+                #也可指定本机地址
+                export DOCKER_HOST="tcp://127.0.0.1"
+
+章节6  课时1
+ 	   【dockerfile上】
+	     	创建dockerfile
+     	 	vim Dockerfile
+     	 	#First Dockerfile
+ 	 		#FROM <iamge>:<tag> 必须是已存在的镜像
+ 	 		#第一条必须是非注释语句
+ 	 		FROM ubuntu:14.04
+ 	 		#指定镜像的作者信息和联系方式
+ 	 		MAINTAINER dormancypress "xyrland@163.com"
+ 	 		#指定镜像中运行的命令 shell模式 exec模式
+ 	 		RUN apt-get update
+ 	 		RUN apt-get install -y nginx
+ 	 		#指定运行该镜像的容器使用的端口
+ 	 		EXPOSE 80
+
+       【dockerfile下】
+       		添加CMD 命令
+	     	vim Dockerfile
+   		    FROM ubuntu:14.04
+ 	 		MAINTAINER dormancypress "xyrland@163.com"
+ 	 		RUN apt-get update
+ 	 		RUN apt-get install -y nginx
+ 	 		EXPOSE 80
+ 	 		CMD [/user/sbin/nginx,g ,"daemon off;"]	
+	     	docker build -t='dockerfile_jx2' .
+	     	docker run -p 80 --name dockerfile_rq2 dockerfile_jx2 #不用添加启动命令
+	     	docker ps
+	     	docker top dockerfile_rq2
+
+	     	/bin/bash 覆盖CMD命令
+	     	                   指定容器名          指定运行的镜像
+	     	docker run -p 80 --name dockerfile_rq3 dockerfile_jx2 /bin/bash
+	     	docker ps
+	     	docker top dockerfile_rq3
+	     	#可以看到不会再运行CMD [/user/sbin/nginx,g ,"daemon off;"]这台命令
+
+		【ENTRYTPOINT命令】
+       		添加CMD 命令
+	     	vim Dockerfile
+   		    FROM ubuntu:14.04
+ 	 		MAINTAINER dormancypress "xyrland@163.com"
+ 	 		RUN apt-get update
+ 	 		RUN apt-get install -y nginx
+ 	 		EXPOSE 80
+ 	 		ENTRYPOINT [/user/sbin/nginx,g ,"daemon off;"]	
+	     	docker build -t='dockerfile_jx2' .
+	     	docker run -p 80 --name dockerfile_rq4 dockerfile_jx2 /bin/bash
+	     	docker ps
+	     	docker top dockerfile_rq4
+	     	#可以看到ENTRYPOINT 命令已经在运行，没有运行/bin/bash
+            vim index.html
+
+        【COPY命令】把nginx默认页面替换为我们指定的页面
+
+			vim index.html
+
+			vim Dockerfile
+			FROM ubuntu:14.04
+			MAINTAINER dormancypress "xyrland@163.com"
+			RUN apt-get update
+			RUN apt-get install -y nginx
+			COPY index.html /usr/share/nginx/html/
+			EXPOSE 80
+
+			docker build -t='dockerfile_jx_cp' . 
+
+			#          -d 后台运行  --name 指定运行的容器名       指定运行的镜像dockerfile_jx_cp    nginx程序
+			docker run -d --name dockerfile_copy  -p 80 dockerfile_jx_cp nginx -g "daemon off;"       
+
+			curl 127.0.0.1:32768
+
+
+        【WORKDIR】 /path/to/workdir 指定容器的工作目录 绝对路径
+         
+         【VOLUME】[ "/data"] 卷
+
+         【ENV】 《key》 环境变量 构建和运行都有效
+
+         【USER】 镜像指定用户运行身份,默认为root
+
+         【ONBULID】 镜像触发器
+         当一个镜像被其他镜像作为基础镜像时执行
+          	
+         【ONBULID测试】
+         --创建镜像dockerfile_jx_onbuild没有测试页面test static，基于镜像dockerfile_jx_onbuild创建新镜像dockerfile_jx_onbuild2有测试页面test static
+
+	         1.创建一个镜像包含onbuild语句
+	         	vim Dockerfile
+				FROM ubuntu:14.04
+				MAINTAINER dormancypress "xyrland@163.com"
+				RUN apt-get update
+				RUN apt-get install -y nginx
+				ONBULID COPY index.html /usr/share/nginx/html/
+				EXPOSE 80
+	          2.创建镜像
+	          	docker build -t='dockerfile_jx_onbuild' . 
+	          3.运行镜像
+	            docker run -d --name dockerfile_rq_onbuild  -p 80 dockerfile_jx_onbuild nginx -g "daemon off;" 
+	            #查看nginx的测试页面，还是原始页面
+	            curl 127.0.0.1:32769
+	           4.基于镜像dockerfile_jx_onbuild构建新镜像dockerfile_jx_onbuild2
+		         mkdir -p onbuild
+		         cd onbuild
+		         vim Dockerfile
+	           
+	           5.新建配置文件
+				 FROM dockerfile_jx_onbuild
+				 MAINTAINER dormancypress "xyrland@163.com"
+				 EXPOSE 80
+	            6.新建测试页面 test static
+	             vim index.html 
+	            7.基于新dockerfile创建新镜像dockerfile_jx_onbuild2
+	             docker build -t='dockerfile_jx_onbuild2' .
+	 			8.用新镜像跑nginx
+	             docker run -d --name dockerfile_rq_onbuild2  -p 80 dockerfile_jx_onbuild2 nginx -g "daemon off;" 
+	             docker images
+	             curl 127.0.0.1:32770
+	             可以看到新的测试页面test static
+
+	【dockerfile构建过程】
+			从基础镜像运行一个容器
+			执行一条指令，对容器做出修改
+			提交新镜像层
+			基于刚提交的镜像运行新容器
+			执行下一条指令，对容器做出修改
+			提交新镜像层
+			基于刚提交的镜像运行新容器
+			子子孙孙无穷尽也	
+			
+			【每一次会删除容器，但是不会删除创建好的镜像，我们可以通过测试这些镜像，得到我们最后想要的容器】		
+
+  
+            【使用中间层镜像】
+            	排查错误
+
+            【构建缓存】
+            	using cache
+
+            	不使用缓存【方案一】  docker build -t='dockerfile_jx_onbuild2' --no cache .
+            			  【方案二】 --在Dockerfile配置上 添加命令ENV REFRESH_DATE 2018-03-06 在这条命令后面都不再使用缓存
+
+            【docker历史】
+            	docker history dockerfile_jx_onbuild2
+
+总结：
+		Dockerfile 执行过程
+		构建镜像的中间层调试
+		Dockerfile 镜像缓存
+		查看镜像构建的过程
+
+章节7 第一课时网络连接
+		Docker容器的网络基础
+		Docker容器的互联
+		Docker容器与外部网络的连接
+
+		docker0  网桥 → 网桥
+			1.可以设置IP地址 【IP:172.17.42.1 255.255.0.0 】65534 MAC:【02:42:ac:11:00:00-02:42:ac:11:ff:ff】
+			2.相当于拥有一个隐藏的虚拟网卡
+			3.安装管理工具[root@localhost onbuild]# yum install -y bridge-utils
+
+                      -----------------------------
+                      |          docker0          |  
+         Host:        | veth*     veth*     veth* |  
+                      -----------------------------
+         Containers:    eth0       eth0      eth0
+
+         【安装网桥管理工具】
+         		yum install -y bridge-utils
+         		sudo yum install -y net-tools
+         		#查看网桥设备
+         		shdo brctl show
+         		#运行一个ubuntu镜像
+         		docker images
+         		docker run -it --name ubuntu1 dc4491992653 /bin/bash
+                ctrl + p
+                #查看连接容器的网络接口veth***
+                sudo brctl show
+                ifconfig
+                自定义docker 0 ,给容器分配ip地址
+                	ifconfig docker0 192.168.200.1 netmask 255.255.255.0
+                	#查看docker0 地址
+                	ifconfig
+                	#service docker restart 
+                	#* 修改文件 /etc/docker/daemon.json 添加内容 "bip": "ip/netmask" [ 切勿与宿主机同网段 ]
+						---------------------------------------
+								{
+								"bip":"192.168.200.1/24" 
+								}
+						---------------------------------------
+                	#跑一个容器
+                	docker run -it --name ubuntu2 dc4491992653 /bin/bash
+                	#查看容器地址
+                	ifconfig
+
+            【用br0替换docker0】
+            	#添加虚拟网卡
+            		sudo brctl addbr br0
+            		sudo ifconfig br0 192.168.100.1 netmask 255.255.255.0
+            	#更改docker守护进程的启动配置
+            		/etc/sysconfig/docker
+            		-b=br0
+            		-------------------------------------------------------
+            		echo 'DOCKER_OPTS="-b=br0"' >> /etc/default/docker   #配置不成功无法配置
+            		-------------------------------------------------------
+                #查看设置是否成功
+                	 ps -ef | grep docker
+
+                 #新建容器
+                 	docker run -it --name ubunt3 dc4491992653  /bin/bash
+                 	#查看是否连接到新网桥br0 192.168.100.1
+                 	ifconfig
+
+章节7 课时3【docker容器的互联】
+			允许所有容器互联
+			拒绝容器间互联
+			允许特定荣启间的连接
+
+
+         1.用于准备工作
+         	1.用于创建测试Docker镜像的Dockerfile：
+         		vim Dockerfile
+				FROM ubuntu:14.04
+				RUN apt-get install -y ping
+				RUN apt-get update
+				RUN apt-get install -y nginx
+				RUN apt-get install -y curl
+				EXPOSE 80
+				#指明镜像在运行时的启动命令
+				CMD /bin/bash
+
+         		docker build -t dockernet1 .
+
+         2.创建2个镜像进行默认连接
+         		docker run -it --name cct1 dockernet1
+         		nginx
+         		ifconfig
+         		#[192.168.200.2]
+         	  	docker run -it --name cct2 dockernet1
+         	  	ifconfig
+         	  	#[192.168.200.3]
+         	  	ctrl+p
+
+         	  	#192.168.200.3
+         	  	docker attach cct2
+         	  	cct2 ping cct1
+         	  	curl 192.168.200.1
+         
+         3.创建代号link 避免容器重启ip变化，带来的业务波动影响
+         		docker run -it --name cct3 --link=cct1:webtest dockernet1
+                #利用别名连接到cct1的服务器上
+                ping webtest
+                env
+                cat /etc/hosts
+                docker restart cct1 cct2 cct3
+
+         4.Docker守护进程
+         		
+         		#利用iptables阻断所有容器间的链接 #--icc=false 表示阻断容器访问
+         		-------------------------------------------------------
+        		echo 'DOCKER_OPTS="--icc=false"' >> /etc/default/docker   #配置不成功无法配置
+        		-------------------------------------------------------        		
+
+
+	【允许特定容器间的链接】
+			#利用iptables阻断所有容器间的链接
+			--icc=false 
+			--iptables=true
+			--link
+			1.[实验-存在容器 cct1[192.168.200.2] cct2 cct3 仅仅允许容器cct1 cct3间通信]
+			vim /etc/sysconfig/docker
+			echo 'DOCKER_OPTS="--icc=false --iptables=true"' >> /etc/default/docker
+			docker restart cct1 cct2 cct3
+			docker attach cct1
+			nginx
+			ctrl + p q
+			attach cct3
+			curl  webtest
+			#结果cct3可以访问cct1
+			attach cct2
+			ping 192.168.200.1
+			#结果不通
+			curl  webtest
+			#结果cct2不可以访问cct1的nginx页面
+			#查看防火墙
+			iptables -L -n
+			-------------------------------------------------------------------------------------------
+			[root@dockersevice tmp]# iptables -L -n
+			Chain INPUT (policy ACCEPT)
+			target     prot opt source               destination         
+
+			Chain FORWARD (policy ACCEPT)
+			target     prot opt source               destination         
+			DOCKER-ISOLATION  all  --  0.0.0.0/0            0.0.0.0/0           
+			DOCKER     all  --  0.0.0.0/0            0.0.0.0/0           
+			ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+			ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
+			DROP       all  --  0.0.0.0/0            0.0.0.0/0           
+
+			Chain OUTPUT (policy ACCEPT)
+			target     prot opt source               destination         
+
+			#这就是配置--link的结果，cct1和cct3之间能互通
+			Chain DOCKER (1 references)
+			target     prot opt source               destination         
+			ACCEPT     tcp  --  192.168.200.4        192.168.200.2        tcp dpt:80
+			ACCEPT     tcp  --  192.168.200.2        192.168.200.4        tcp spt:80
+
+			Chain DOCKER-ISOLATION (1 references)
+			target     prot opt source               destination         
+			RETURN     all  --  0.0.0.0/0            0.0.0.0/0           
+			[root@dockersevice tmp]# 
+			-------------------------------------------------------------------------------------------------
+
+			
+
+
+			实验结果：DOCKER_OPTS="--icc=false --iptables=true"时，仅有--link选项之间的容器能互相访问。
+
+			
+章节7 课时4【docker容器与外部网络的连接】
+
+			ip_forward
+			iptables
+			允许端口映射访问
+			限制ip对容器的访问
+
+			--ip-forward=true 
+			#true = 1
+			sysctl net.ipv4.conf.all.forwarding 
+			[root@dockersevice tmp]# sysctl net.ipv4.conf.all.forwarding
+			net.ipv4.conf.all.forwarding = 1
+			docker port cct5 
+			docker run -it -p 80 --name cct5 dockernet1
+			docker run -it -p 80 --name cct6 dockernet1
+			#禁止cct1[192.168.200.2]访问cct6[192.168.200.4]的nginx
+			iptables -I DOCKER -s 192.168.200.2 -d 192.168.200.4 -p TCP --dport 80 -j DROP
+			#docker attach cct1
+			curl 192.168.200.4:80
+			#结果无法访问
+
+章节8 课时1 【数据卷】
+			
+			Data Volume
+			数据卷是经过特殊设计的目录，可以绕过联合文件系统，为1个或多个容器提供访问。
+				设计目的：在于数据的永久化，它完全独立于容器的生存周期，因此，Docker不会在容器删除时删除其挂载的数据卷，也不会存在类似的垃圾收集机制，对容器引用的数据卷进行处理。
+
+			------------------------------------------------
+            |              Dcoker Host                     |
+            |------------------------					   |
+            |      Docker           |                      |
+            |                       |                      |
+            |     container1        |                      |
+            |                       |                      |            
+            |                       |                      |
+            |     container2        |   Directory/File     |
+            |                       |    Data  Volume      |
+            |                       |                      |     
+            |     container3        |                      |
+            |                       |                      |
+            |                       |                      |     
+		    ------------------------------------------------
+
+
+		    【数据卷的特点】
+		    		数据卷在容器启动时初始化，如果容器使用的镜像在挂载点包好了数据，这些数据会拷贝到新初始化的数据卷中。
+		    		数据卷可以在容器之间共享和重用。
+		    		可以对数据卷里的内容直接进行修改。
+		    		数据卷的变化不会影响镜像的更新。
+		    		卷会一直存在，即使挂载数据卷的容器已经被删除。
+
+		   为容器添加数据卷   
+		   					  ~宿主机目录（不存在自动创建）:容器目录
+		   		#docker run -v ~/container_data:/data -it ubuntu /bin/bash
+		   		docker run -it -v ~/datavolume:/data  ubuntu /bin/bash
+		   		ls -l
+		   		echo "I'm in docker container" > /data/c1
+		   		exit
+		   		#在宿主机查看
+		   		docker inspect 容器id
+		   		/root/datavolume:/data
+		   		"Binds": [
+                "/root/datavolume:/data"
+                ],
+ 			
+ 			为数据卷添权限
+
+
+
+
+
+	
+
