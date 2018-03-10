@@ -1,0 +1,119 @@
+【数据卷容器】
+	命名的容器挂载数据卷，其他容器通过挂载这个容器实现数据共享，挂载数据卷的容器就叫做数据卷容器。
+
+----------------------------------------------------------------------
+|						    Docker Host                               |
+|														     	      |
+|   ---------------------------------          ---------------------  |    
+|   |        Docker                  |         |  Local FileSystem |  |
+|   |  -----------                   |         |                   |  |
+|   | |container1 | →                |         |                   |  |
+|   | ------------                   |         |                   |  |
+|   | ------------    -------------- |         |  ---------------  |  |
+|   | |container2|  →  |Datacontainer--------------Directory/File| |  |
+|   | ------------    -------------- |         | --------------- | |  |
+|   | -----------                    |         |                   |  |
+|   | |container3| →                 |         |                   |  |
+|   | ------------                   |         |                   |  |
+|   |                                |         |                   |  |                               |         |                   |  |
+|    ---------------------------------          --------------------  |
+|																	  |
+----------------------------------------------------------------------   
+
+【挂载数据卷容器的方法】
+        1.创建Dockerfile
+		#FROM <iamge>:<tag> 必须是已存在的镜像
+		#第一条必须是非注释语句
+		FROM dockerfile
+		VOLUME [ /datavolume1 , /datavolume2 ]
+		CMD /bin/bash
+		#创建挂载了2个数据卷的镜像volume
+		docker build -t volume .
+		#以镜像volume创建容器volume2    
+		docker run --name volume2 -it volume
+		ls
+		docker inspect volume2
+
+		#在数据卷创建文件dvt4_1
+		touch /datavolume1/dvt4_1
+		ls /datavolume1
+		exit
+
+        #新容器dvt5 挂载数据卷容器volume2   
+        #新容器名字dvt5 关键字--volumes-from 数据卷容器名字volume2  镜像名字ubuntu     
+		docker run -it --name dvt5 --volumes-from volume2 ubuntu /bin/bash
+		ls /datavolume1
+
+		docker inspect volume2
+
+        #此时删除数据卷容器volume2，容器dvt5依旧能访问数据卷。
+        #说明数据卷容器volume2的作用只是给容器dvt5传递了一个目录。
+
+        $ docker stop $(docker ps -a -q) //  stop停止所有容器
+        $ docker  rm $(docker ps -a -q) //   remove删除所有容器
+
+------------------------------------------------------------------------------------
+        1.创建Dockerfile
+		#FROM <iamge>:<tag> 必须是已存在的镜像
+		#第一条必须是非注释语句
+		FROM dockerfile
+		VOLUME [ /datavolume1 , /datavolume2 ]
+		CMD /bin/bash
+		#创建挂载了2个数据卷的镜像volume
+		docker build -t volume .
+		#以镜像volume创建容器volume2    
+		docker run --name volume2 -it volume
+		cd /datavolume1
+		touch 1.txt
+		ls
+		docker inspect volume2
+		"Source": "/var/lib/docker/volumes/9dd7f6075f903664f0dffed89dafa846f0c3a88f0c032d5ab4478ed8bedfcf21/_data",
+        "Destination": "/datavolume1",
+
+        #新容器dvt5 挂载数据卷容器volume2   
+        #新容器名字dvt5 关键字--volumes-from 数据卷容器名字volume2  镜像名字ubuntu     
+		docker run -it --name dvt5 --volumes-from volume2 volume /bin/bash
+		ls /datavolume1
+		docker inspect dvt5
+		"Source": "/var/lib/docker/volumes/9dd7f6075f903664f0dffed89dafa846f0c3a88f0c032d5ab4478ed8bedfcf21/_data",
+        "Destination": "/datavolume1",
+
+        docker run -it --name dvt6 --volumes-from volume2 ubuntu /bin/bash
+        "Source": "/var/lib/docker/volumes/9dd7f6075f903664f0dffed89dafa846f0c3a88f0c032d5ab4478ed8bedfcf21/_data",
+        "Destination": "/datavolume1",
+
+
+章节8课时1【docker容器跨主机连接】
+		【跨主机连接】           GateWay
+                               /         \
+                              /           \ 
+---------------------------- /             \------------------------------
+|        Docker Host1       / |            |\         Docker Host2        |
+|                          /  |            | \                            |
+|host eth0  192.168.59.103    |            |  host eth0 192.168.59.104    |
+|             |               |    (GRE)   |             |                |         
+|          obrO   <-----------------------------------> obrO              |
+|             |               |            |             |                |
+|  docker0 192.168.1.0/24     |            |       bro 192.168.2.024      |
+|       |            |        |            |        |          |          |
+|container eth0 container etho|            |container etho  container etho|
+-------------------------------             -------------------------------
+         
+         【步骤】
+         
+
+         【材料准备】
+				Mac OSX+Virtualbox
+				两台Ubuntu14.04虚拟机
+				双网卡，Host-Only &NAT
+				·安装Open vSwitch：
+					apt-get install openvswitch-switch
+
+				·安装网桥管理工具：
+					apt-get install bridge-utils
+
+				·IP地址：Host1:192.168.59.103
+					     Host2:192.168.59.104
+
+
+

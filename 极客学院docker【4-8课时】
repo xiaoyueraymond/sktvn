@@ -97,6 +97,7 @@
  	 		RUN apt-get install -y nginx
  	 		EXPOSE 80
  	 		CMD [/user/sbin/nginx,g ,"daemon off;"]	
+ 	 		# -t 的指定镜像名字
 	     	docker build -t='dockerfile_jx2' .
 	     	docker run -p 80 --name dockerfile_rq2 dockerfile_jx2 #不用添加启动命令
 	     	docker ps
@@ -446,18 +447,92 @@
 		   为容器添加数据卷   
 		   					  ~宿主机目录（不存在自动创建）:容器目录
 		   		#docker run -v ~/container_data:/data -it ubuntu /bin/bash
-		   		docker run -it -v ~/datavolume:/data  ubuntu /bin/bash
+		   		docker run -it -v ~/datavolume:/data  --name dockerfile1 ubuntu /bin/bash
 		   		ls -l
 		   		echo "I'm in docker container" > /data/c1
 		   		exit
 		   		#在宿主机查看
 		   		docker inspect 容器id
 		   		/root/datavolume:/data
+
 		   		"Binds": [
                 "/root/datavolume:/data"
                 ],
  			
- 			为数据卷添权限
+ 			
+ 			---------------------------------------------------------
+		 			"Mounts": [
+		            {
+		                "Source": "/root/datavolume",
+		                "Destination": "/data",
+		                "Mode": "",
+		                "RW": true,
+		                "Propagation": "rprivate"
+		            }
+		        ]
+		    ----------------------------------------------------------------------
+
+
+            为数据卷添权限,[为新容器指定数据卷，并且只有只读权限]
+		    docker run -it -v ~/datavolume:/data:ro --name dockerfile2 ubuntu /bin/bash
+		    ------------------------------------------------------------------------
+		    root@04e6b9afa5b6:/data# touch 1.txt
+			touch: cannot touch '1.txt': Read-only file system
+			root@04e6b9afa5b6:/data# 
+			[root@dockersevice datavolume]# docker inspect dockerfile2
+
+			            {
+                "Source": "/root/datavolume",
+                "Destination": "/data",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+			---------------------------------------------------------------------------
+
+			利用dockerfile 创建包含数据卷的镜像，再创建容器
+
+			vim dockerfile
+			#FROM <iamge>:<tag> 必须是已存在的镜像
+			#第一条必须是非注释语句
+			FROM dockerfile
+			VOLUME [ /datavolume1 , /datavolume2 ]
+			CMD /bin/bash
+
+			docker build -t volume .
+			docker run --name volume1 -it volume
+			exit
+			
+			[root@dockersevice volume]# docker inspect volume1
+			#可以看到创建的数据卷在宿主机上对应的位置
+			-----------------------------------------------------------------------------
+			            {
+                "Name": "de64c384bcec1366b8504cbd6b51c624590648f17d230a160dfc2747c4764e20",
+                "Source": "/var/lib/docker/volumes/de64c384bcec1366b8504cbd6b51c624590648f17d230a160dfc2747c4764e20/_data",
+                "Destination": "/datavolume1",
+                "Driver": "local",
+                "Mode": "",
+                "RW": true,
+                "Propagation": ""
+            },
+            {
+                "Name": "e34608a5a1ab3a3af946fec01573dc7023cb5fbe8f8a580662212bbac93d312d",
+                "Source": "/var/lib/docker/volumes/e34608a5a1ab3a3af946fec01573dc7023cb5fbe8f8a580662212bbac93d312d/_data",
+                "Destination": "/datavolume2]",
+                "Driver": "local",
+                "Mode": "",
+                "RW": true,
+                "Propagation": ""
+            }
+            ----------------------------------------------------------------------------------
+            docker run --name volume2 -it volume
+            volume2 的数据卷和 volume1 的宿主机地址不同，无法共享
+
+
+
+
+
+
 
 
 
