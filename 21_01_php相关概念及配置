@@ -1,0 +1,159 @@
+21_01_php相关概念及配置
+
+	JVM：Java Virtual Machine
+			 C，Windows
+			 Java 一次编译,到处运行
+
+	Java Applet
+
+     
+windows Java 虚拟机	|   Linux Jave 虚拟机
+	Windows         |           Linux
+
+
+	Web服务器执行程序
+	CGI,在web服务器调用动态执行程序,将结果返回成html
+		Common Gateway Interface
+
+	静态语言：编译型语言
+	C,C++,JAVA
+     		效率高，编译就执行，
+     		性能极高的场景,比如导弹,开发周期长
+
+
+	动态语言:解释型语言
+	shell,perl,python
+			开发周期短
+			库强大,各种模块,库
+			便于维护
+
+	faceebook
+	动态语言 → 静态语言
+ 	php → hithop 转换器 → 静态
+ 	
+ 	bash
+ 	perl
+ 	python
+ 	java,Jsp,ssh(Spring,Stucts，Hibernate)
+
+ 	ruby，rails
+
+ 	Php
+ 	Asp
+
+ 	程序进阶：
+
+ 	基本算法
+ 	算法,数据结构
+ 	编译原理
+
+ 	发挥优点
+ 	Persional Home Page Tool
+ 	互联网
+
+ 	超文本预处理器
+ 	Php is Hypertext Preprocessor
+
+ 	php解释型语言
+ 		php source code --> 编译成二进制  --> 执行二进制格式
+
+ 		Zend opcode
+ 		opcode 缓存器 或者成为 php加速器
+ 			APC Alternative PHP Cache
+ 			eAccelerator
+ 			XCache
+
+
+
+	 解释器
+	 	词法分析
+	 	语言分析
+	 	生成执行路径
+
+	 	【php源码结构】
+	 	1.build
+	 	2.ext 扩展目录
+	 	3.main 核心文件
+	 	4.Zend 引擎
+	 	5.pear
+	 	6.sapi
+	 	7.TSRM
+	 	8.tests
+	 	9.win32
+
+------------------获取进程ID------------------------
+PIDS=`ps -aux | grep php | awk '{print $2}'`
+do
+  echo "杀列进程[ $i ]"
+  kill -9 $i
+done
+
+cd /data/www/base-backend/bin/
+php start_swoole_server.php start -d
+--------------------------------------------------
+
+
+	【编程数据逻辑分离】 MVC 结构
+	嵌入式web开发语言
+
+		index.php
+
+		<html>
+			<head></head>
+			<h1>a.php</head>
+		<php
+
+		?>
+
+		</htnl>
+
+		【PHP与apache交互】
+				【CGI】     生成php进程
+				【module】
+				【FastCGI】 5.3 支持fpm
+
+			1.apache 生成php进程
+			2.cgi负责php进程的启动和结束
+			3.php的生命周期
+			4.http 独立
+
+			http 无状态协议 每个请求都是需要建立连接的
+			200:php
+			3000:static content
+				prefork 请求
+
+				apache进程 2M  + php 20M
+				并发在线200用户 200*2M + 200*20M
+
+				合二为一
+				apache支持动态共享
+				DSO：dynamic shared object 动态共享对象
+					把php编译成模块
+					php_mod
+					在同一个进程通告调用php模块搞定静态加动态
+					CGI 临时创建模型
+
+			   【处理模型三Fast CGI】	
+				apache服务器   把请求交给php服务器处理
+
+				php服务器
+
+				【分开的话用Nginx + fpm 比apche + fpm 效率高 】
+
+				实验安装php53
+
+				yum install -y php53 php53-mbstring
+				rpm -ql php53
+
+				php.conf
+				    #用php5-script 处理.php文件
+					AddHandler php5-script .php
+					#把.php文件识别为text/html格式 
+					AddType text/html .php
+
+				#默认主页
+				DirectoryIndex index.php
+
+
+
+

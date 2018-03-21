@@ -86,7 +86,7 @@
 章节8课时1【docker容器跨主机连接】
 
         【跨主机连接】 
-        
+
 						                         GateWay
 				                               /         \
 				                              /           \ 
@@ -104,6 +104,12 @@
          
          【步骤】
 
+             	·建立ovs网桥
+				·添加gre连接
+				·配置docker容器虚拟网桥
+				·为虚拟网桥添加ovs接口
+				·添加不同Docker容器网段路由
+
 
          【材料准备】
 				Mac OSX+Virtualbox
@@ -117,6 +123,125 @@
 
 				·IP地址：Host1:192.168.59.103
 					     Host2:192.168.59.104
+
+
+-----------------------------------------------------------------------------------------------
+centos7安装openvswitch虚拟交换机【https://www.cnblogs.com/xkops/p/5568167.html】
+
+1.安装依赖软件包，及创建普通用户ovs。
+yum -y install wget gcc make python-devel openssl-devel kernel-devel graphviz kernel-debug-devel autoconf automake rpm-build redhat-rpm-config libtool
+adduser ovs
+su - ovs
+
+2.下载源码包，并创建rpm包。
+mkdir -p ~/rpmbuild/SOURCES
+wget http://openvswitch.org/releases/openvswitch-2.3.2.tar.gz
+cp openvswitch-2.3.2.tar.gz ~/rpmbuild/SOURCES/
+tar xfz openvswitch-2.3.2.tar.gz
+sed 's/openvswitch-kmod, //g' openvswitch-2.3.2/rhel/openvswitch.spec > openvswitch-2.3.2/rhel/openvswitch_no_kmod.spec
+rpmbuild -bb --nocheck openvswitch-2.3.2/rhel/openvswitch_no_kmod.spec
+exit
+
+3.创建ovs配置目录，并安装制作好的rpm包。
+mkdir /etc/openvswitch
+yum localinstall /home/ovs/rpmbuild/RPMS/x86_64/openvswitch-2.3.2-1.x86_64.rpm
+
+4.如果selinux开启，请执行如下操作，如未开启，请略过此步骤。
+yum install policycoreutils-python 
+semanage fcontext -a -t openvswitch_rw_t "/etc/openvswitch(/.*)?" 
+restorecon -Rv /etc/openvswitch
+
+5.启动服务，并查看ovs版本信息。
+
+chkconfig openvswitch on
+systemctl restart openvswitch.service
+ovs-vsctl -V
+----------------------------------------------------------------------------------------------------------------
+
+ 		【给容器自定义地址】
+                 自定义docker 0 ,给容器分配ip地址
+                	ifconfig docker0 192.168.200.1 netmask 255.255.255.0
+                	#查看docker0 地址
+                	ifconfig
+                	#service docker restart 
+                	#* 修改文件 /etc/docker/daemon.json 添加内容 "bip": "ip/netmask" [ 切勿与宿主机同网段 ]
+						---------------------------------------
+								{
+								"bip":"192.168.100.1/24" 
+								}
+						---------------------------------------
+                	#跑一个容器
+                	docker run -it --name ubuntu2 dc4491992653 /bin/bash
+                	#查看容器地址
+                	ifconfig
+
+        【实验步骤】
+        	1.[10.100.13.115配置][dcoker 192.168.200.0/24]
+                #查看虚拟交换机openvswtich
+        		ovs-vsctl -V
+        		#创建obr0
+        		ovs-vsctl add-br obr0
+        		#绑定隧道
+        		add-port obr0 gre0
+        		#隧道设置
+        		set interface gre0 type=gre options:remote_ip=10.100.13.118
+        		#查看配置
+        		ovs-vsctl show
+        		#obr0桥接docker0设置
+        		brctl addif docker0 obr0
+        		#查看桥接
+				brctl show
+				
+
+				#添加路由表      目的ip             下一跳         出接口
+				ip route add 192.168.100.0/24 via 10.100.13.118 dev enp0s8
+				删除条目
+				#ip route delete 192.168.100.0/24 via 10.100.13.115 dev enp0s8
+
+  				#查看路由表
+  				route
+  				---------------------------------------------------------------------------------
+  				Kernel IP routing table
+				Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+				default         gateway         0.0.0.0         UG    100    0        0 enp0s3
+				default         gateway         0.0.0.0         UG    101    0        0 enp0s8
+				10.0.2.0        0.0.0.0         255.255.255.0   U     100    0        0 enp0s3
+				10.100.13.0     0.0.0.0         255.255.255.0   U     100    0        0 enp0s8
+				192.168.100.0   10.100.13.118   255.255.255.0   UG    0      0        0 enp0s8
+				192.168.200.0   0.0.0.0         255.255.255.0   U     0      0        0 docker0
+				[root@dockersevice sysconfig]# 
+
+  				---------------------------------------------------------------------------------
+                #测试容器
+                docker run -it ubunt /bin/bash
+                ping 192.168.100.2
+
+        	2.[10.100.13.118配置][dcoker 192.168.100.0/24]
+        	    #安装网络工具
+        	    sudo yum install net-tools -y
+                #查看虚拟交换机openvswtich
+        		ovs-vsctl -V
+        		#创建obr0
+        		ovs-vsctl add-br obr0
+        		#绑定隧道
+        		ovs-vsctl add-port obr0 gre0
+        		#隧道设置
+        		set interface gre0 type=gre options:remote_ip=10.100.13.115
+        		#查看配置
+        		ovs-vsctl show
+        		#obr0桥接docker0设置
+        		brctl addif docker0 obr0
+        		#查看桥接
+				brctl show
+				
+
+				#添加路由表      目的ip             下一跳         出接口
+				ip route add 192.168.200.0/24 via 10.100.13.115 dev enp0s8
+
+
+  				#查看路由表
+  				route
+
 
 
 

@@ -70,12 +70,15 @@ UUID=7ddca6b9-2e01-4cb0-b2e0-68e72adcb1b5 /data1              ext4    defaults  
 
 1）先查看现在虚拟机有的磁盘
 virsh domblklist cent68-vpn
+#virsh domblklist init-zhenghangzhou
 
 2）创建一块qcow2的1G虚拟磁盘
 进入存储池/data/images,页面创建vpn68-4.img
 
 3）在线为cent68-vpn添加虚拟磁盘
 virsh attach-disk cent68-vpn /data/images/vpn68-4.img  vdd --cache=none --subdriver=qcow2
+#virsh attach-disk init-zhenghangzhou /data/kvm/images/init-zhenghangzhou2.img vdd --cache=none --subdriver=qcow2
+
  
 
 4）再次查看现在虚拟机的磁盘是不是多了一块
@@ -89,6 +92,7 @@ fdisk –l
 
 1、先查看一下当前虚拟机配置文件，这里看到的配置文件虽然已经有了新增加的磁盘，重启之后会消失，所以主要将新添加的磁盘保存到虚拟机的配置文件中
 virsh dumpxml cent68-vpn
+#virsh dumpxml init-zhenghangzhou
 
 -------------------------------------------------------------------------------------------
 <disk type='file' device='disk'>
@@ -121,7 +125,9 @@ virsh edit cent68-vpn
 df –hT
 
 2.格式化磁盘
+fdiks -l
 mkfs.ext4 /dev/vdd
+#mkfs.ext4 /dev/vdb
 
 【扩展LV逻辑卷http://lzw.me/a/linux-lvm.html】
 【分区，硬盘】  →  【物理卷PV】→ 【卷组VG】  → 【逻辑卷LV】 
@@ -147,14 +153,12 @@ vgextend VolGroup /dev/vdd
 8.扩展逻辑卷
  lvextend -L +8G /dev/mapper/VolGroup-lv_root
 
-11、挂载
-mount
  
-12、重新识别硬盘
+9、重新识别硬盘
 
 resize2fs /dev/mapper/VolGroup-lv_root
 
-13、查看硬盘使用情况可以看到/目录已经扩容
+10、查看硬盘使用情况可以看到/目录已经扩容
 
 df –hT
 ----------------------------------------------------------------------------------------
@@ -185,3 +189,52 @@ tmpfs                 915M     0  915M   0% /dev/shm
 
 
 ----------------------------------------------------------------------------------------
+
+报错resize2fs: Bad magic number in super-block while trying to open /dev/centos/root Couldn't find valid filesystem superblock
+
+今天在进行lvm扩容之后，按照惯例进行 resize2fs 操作，发现报如下错误：
+
+# resize2fs /dev/centos/root 
+resize2fs 1.42.9 (28-Dec-2013)
+resize2fs: Bad magic number in super-block while trying to open /dev/centos/root
+Couldn't find valid filesystem superblock.
+检查 /dev/centos/root 文件系统，发现是xfs，如下;
+
+# mount |grep root
+/dev/mapper/centos-root on / type xfs (rw,relatime,attr2,inode64,noquota)
+xfs的文件系统重新定义大小用如下命令：
+
+# xfs_growfs /dev/mapper/centos-root 
+meta-data=/dev/mapper/centos-root isize=256 agcount=4, agsize=3276800 blks
+ = sectsz=512 attr=2, projid32bit=1
+ = crc=0 finobt=0
+data = bsize=4096 blocks=13107200, imaxpct=25
+ = sunit=0 swidth=0 blks
+naming =version 2 bsize=4096 ascii-ci=0 ftype=0
+log =internal bsize=4096 blocks=6400, version=2
+ = sectsz=512 sunit=0 blks, lazy-count=1
+realtime =none extsz=4096 blocks=0, rtextents=0
+data blocks changed from 13107200 to 39336960
+重新进行df -h查看挂载点，发现大小已经更改。
+------------------------------------------------------------------------------------------
+
+
+项目名字:
+public_warehouse_admin
+项目环境:
+ 测试环境
+地址:
+git@gitlab.haitun.kokoerp.com:php/public_warehouse_admin.git
+宿主机
+代码检出仓库
+/www
+排除文件
+机器列表
+用户
+www
+webroot
+/data/www/public_warehouse_admin
+发布版本库
+/data/release/public_warehouse_admin
+机器列表
+192.168.8.239

@@ -1,0 +1,70 @@
+23_02_数据库及MySQL
+	【 指令 + 数据 】  , 14
+	数据管理软件，维护索引关联性
+			查找算法,更新，删除
+
+
+			 PHP
+
+                      客户端
+	         MYSQL
+	         		  数据库
+   php-api  java-api 
+
+   【DBMS 数据库管理系统】 
+
+   		数据的组织结构
+   			层次型
+   			网状结
+   			关系型
+   				表
+
+   【RDBMS 关系型数据库管理系统】
+   		数字完整性
+
+   【RDBMS的功能】
+   		1.数据库创建，删除表
+   		2.创建表，删除表，修改表
+   		3.索引的创建，删除
+   		4.用户和权限
+   		5.数据增，删，改
+   		6.查询
+
+   	DML：数据操作语言
+   		INSERT,REPLACE,UPDATE,DELETE
+
+   	DDL:数据定义语言
+   		CREATE,ALTER,DROP
+   
+    DCL:数据控制语言
+    	GRANT,REVOKE
+
+ SELECT
+
+ RDBMS:
+ 		Oracle 【10+W一年】Sybase,Infomix,SQL Server 跑在微软上的
+开源 	Mysql,PostgrESQL,pgsql,EnterpriserDB
+   	    
+   	    MySQL,SQL,MYSQL AB
+   	    Oracle,IBM,SUM
+
+   	    IBM,
+   	    SUM-->MySQL
+
+   	    BEA:WebLogic
+   	    PeopleSoft
+
+   	    Openoffice 
+
+   	    Libreoffice
+
+   	    反关系模型：
+   	    	NoSQL
+   	    		Redis
+   	    		Hbase---------Hapood
+   	    		MongoDB
+
+
+ 	
+ 	        
+

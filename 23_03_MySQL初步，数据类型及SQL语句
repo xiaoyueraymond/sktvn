@@ -1,0 +1,385 @@
+23_03_MySQL初步，数据类型及SQL语句
+
+	500G
+
+DBMS：
+	数据管理独立性：
+	有效的晚餐数据存取；
+	数据完整性和安全性；
+	数据集中管理；
+	并发存储与故障恢复；
+	减少应用程序开发时间；
+
+关系型数据库：
+	SQL命令发出者
+		php命令
+		用户
+		其他应用程序
+
+	1.分析器[判断命令是否正确]
+	2.计划执行器[分析执行路径]
+	3.优化器[选择最高效语句]
+
+	4.文件的存取的方法
+	5.缓存器
+	6.磁盘存储管理器
+	7.故障恢复管理器
+	8.事务管理器
+	9.锁管理器
+
+【Mysql的使用】
+	Community Edtion
+	Enterprise Edtion [收费]
+    
+ mysql软件包格式：
+ 	软件包管理器特有的格式
+ 		rpm包，.exe
+ 	通用二进制格式 mysql-5.6-libux-glibc2.5-x86_64.tar.gz
+ 	源码格式 
+
+	yum list all | grep mysql
+	mysql  客户端
+		-u 用户名      默认root
+		-p 密码 	   默认为空
+		-h 数据库地址  默认localhost
+
+		mysql -uroot -p -h 127.0.0.1
+		quit
+		\q
+
+		-h 172.0.0.1(host) 
+			Linux:socket  ls/var/lib/mysql.sock 进程间连接,不需要网络
+			windows:memory
+
+	mysqld 服务器  tcp/3306 运行身份mysql
+			/var/lib/mysql
+
+	mysql客户端：
+		交互式模式 	
+			一次一条命令
+			客户端命令
+				\h
+
+			服务器命令
+				必须使用语句结束符，默认是分号;
+				SHOW DATABASES; [区分大小写]
+
+				mysql> SHOW DATABASES;
+
+				+--------------------+
+				| Database           |
+				+--------------------+
+				| information_schema | mysql运行时的数据,在内存中
+				| mysql              |
+				| test               |
+				+--------------------+
+
+
+
+	SQL接口扩展：
+		Oracle， PL/SQL 可编程（私有）
+		SQL Server， T-SQL（私有）
+
+
+		批处理模式
+			执行mysql脚本
+
+
+	RDBMS即关系数据库管理系统(Relational Database Management System)：
+		/var/lib/mysql/ [数据保存的位置]
+		安装完成后初始化
+			1.建立源数据库
+
+	关系数据库对象：
+		库
+		表
+		索引
+		视图
+		约束
+		存储过程
+		存储函数
+		触发器
+		游标
+		用户
+
+		权限
+		事务
+
+	表
+		行，列
+		表：实体
+			行：row 实体集
+			列：filed 属性
+
+	字段名称(见名知意，同变量),数据类型,类型修饰符[限制数据类型],
+		字符[默认不区分大小写] 
+			CHAR(n)   	---固定长度
+			VARCHAR(n)	---可变长
+			BINARY(n) 	---固定长度
+			VARBINARY(n)--可变长
+			TXET(n)     --存储大文本
+			BLOB(n)     --区分大小写
+
+			  
+		数值型
+			精确数值
+				整型
+					INT
+					TINYINT
+					SMALLINT
+					MEDIUMINT
+					BIGINT
+
+					修饰符：UNSINGED 无符号数 大于等于0
+							NOT NULL
+
+				十进制数值型(精确)
+			近似数值型
+				浮点型
+					FLOAT
+					DOUBLE
+
+		日期
+			DATE
+			TIME
+			DATETIME
+			STAMP
+
+		布尔
+			0
+			1
+
+		内置： ENUM 枚举类型
+
+
+	DDL
+		CREAT
+		ALTER
+		DROP
+	DML
+		INSERT
+		UPDATE
+		DELETE
+	DCL
+		GRANT
+		REVOKE
+
+	创建数据库
+		CREATE DATABASE [IF NOE EXISTS]db_name;
+		SHOW DATABASES;
+		CREATE DATABASE IF NOT EXISTS db_name;
+
+		DROP DATABASE db_name;
+		SHOW DATABASES;
+
+	创建表
+		CREATE TABLE tb_nmae(col1,col2,`````)
+		#设置默认数据库mydb
+		USE mydb;  
+
+		CRETE DATABASE mydb2;
+		#设置默认数据库mydb2
+		USE mydb2;
+		#             表名studnets  名字 20个字符串 不能为空 年龄 小整形		
+		CREATE TABLE students(Name CHAR(20) NOT NULL,AGE TINYINT UNSIGNED,Gender CHAR(1) NOT NULL);
+
+		查看库中的表：SHOW TABLES FROM db_name;
+		--------------------------------------
+		mysql> SHOW TABLES;
+		+-----------------+
+		| Tables_in_MYDB2 |
+		+-----------------+
+		| students        |
+		+-----------------+
+		1 row in set (0.00 sec)
+		-----------------------------------------
+
+		查看表结构：  DESC tb_name;
+		删除表；	  DROP TABLE tb_name;
+		--------------------------------------------
+		mysql> SHOW TABLES;
+		+-----------------+
+		| Tables_in_MYDB2 |
+		+-----------------+
+		| students        |
+		+-----------------+
+		1 row in set (0.00 sec)
+		--------------------------------------------
+
+	修改表:
+		ALTER TABLE tb_name
+			MODIFY
+			CHANGE
+			ADD
+			DROP
+
+			ALTER  TABLE students ADD course VARCHAR(100);
+			-------------------------------------------------------
+			mysql> DESC students;
+			+---------+---------------------+------+-----+---------+-------+
+			| Field   | Type                | Null | Key | Default | Extra |
+			+---------+---------------------+------+-----+---------+-------+
+			| Name    | char(20)            | NO   |     | NULL    |       |
+			| AGE     | tinyint(3) unsigned | YES  |     | NULL    |       |
+			| Gender0 | char(1)             | NO   |     | NULL    |       |
+			| course  | varchar(100)        | YES  |     | NULL    |       |
+			+---------+---------------------+------+-----+---------+-------+
+			4 rows in set (0.00 sec)
+
+			----------------------------------------------------------------
+
+			DESC students
+
+			ALTER TABLE students CHANGE course Course VARCHAR(100) AFTER Name;
+			----------------------------------------------------------------
+			mysql> DESC students;
+			+---------+---------------------+------+-----+---------+-------+
+			| Field   | Type                | Null | Key | Default | Extra |
+			+---------+---------------------+------+-----+---------+-------+
+			| Name    | char(20)            | NO   |     | NULL    |       |
+			| Course  | varchar(100)        | YES  |     | NULL    |       |
+			| AGE     | tinyint(3) unsigned | YES  |     | NULL    |       |
+			| Gender0 | char(1)             | NO   |     | NULL    |       |
+			+---------+---------------------+------+-----+---------+-------+
+			4 rows in set (0.00 sec)
+
+			----------------------------------------------------------------
+
+	修改字段名：
+		ALTER TABLE 表名 CHANGE 旧字段名 新字段名 新数据类型;
+		ALTER TABLE students CHANGE Gender0 Gender char(1);
+		-------------------------------------------------------------------
+		+--------+---------------------+------+-----+---------+-------+
+		| Field  | Type                | Null | Key | Default | Extra |
+		+--------+---------------------+------+-----+---------+-------+
+		| Name   | char(20)            | NO   |     | NULL    |       |
+		| Course | varchar(100)        | YES  |     | NULL    |       |
+		| AGE    | tinyint(3) unsigned | YES  |     | NULL    |       |
+		| Gender | char(1)             | YES  |     | NULL    |       |
+		+--------+---------------------+------+-----+---------+-------+
+
+		-------------------------------------------------------------------
+
+
+	DML:
+		INSERT INTO
+			INSERT INTO tb_name(col1,col2,''') VALUES('STRING',NUM,''')
+			INSERT INTO students(Name,Gender) VALUES('LingHuchong','M'),('XiaoLongNv','F');
+
+
+
+			SELECT * FROM students;
+			INSERT INTO students VALUES('XiaoXiangzi','HaMaGong',57,'M');
+
+		UPDATE tb_name SET column='value' WHERE Name='字段名'
+			UPDATE students SET Courese='Hamogong' WHERE Name='Xiaoxiangzi';
+			----------------------------------------------------------------
+
+			Database changed
+			mysql> SELECT * FROM students;
+			+-------------+----------+------+--------+
+			| Name        | Course   | AGE  | Gender |
+			+-------------+----------+------+--------+
+			| LingHuchong | NULL     | NULL | M      |
+			| XiaoLongNv  | NULL     | NULL | F      |
+			| XiaoXiangzi | HaMaGong |   57 | M      |
+			+-------------+----------+------+--------+
+			3 rows in set (0.00 sec)
+
+
+			----------------------------------------------------------------
+
+		选择[指定以某字段作为搜索码,筛选符合条件的行]
+		投影[显示出需要的部分]
+
+		SELECT Name,Course FROM students;
+		SELECT Name,Course FROM students WHERE  Gender='M';
+		UPDATE students SET Course='pixiejianpu' WHERE Name='Linghuchong';
+		UPDATE students SET Course='yunvxinjing' WHERE Name='xiaolongnv';
+
+
+
+			WHERE 指定条件；
+
+		REPLACE INTO 
+
+		删除
+
+		DELETE FROM tb_name WHERE CONDITION;
+		DELETE FROM students WHERE Course='pixiejianfa';
+
+		创建用户
+		CREATE USER 'USERNAME'@'HOST' IDENTIFIED BY 'PASSWD';
+			CREATE USER 'jerry'@'%' IDENTIFIED BY 'jerry';
+
+		#查看用户授权
+			SHOW GRANTS FOR 'USERNAME'@'HOST'
+				SHOW GRANT FOR 'jerry'@'%';
+				-------------------------------------------------
+				right syntax to use near 'GRANT FOR 'jerry'@'%'' at line 1
+				mysql> SHOW GRANTS FOR 'jerry'@'%';
+				+------------------------------------------------------------------------------------------------------+
+				| Grants for jerry@%                                                                                   |
+				+------------------------------------------------------------------------------------------------------+
+				| GRANT USAGE ON *.* TO 'jerry'@'%' IDENTIFIED BY PASSWORD '*09FB9E6E2AA0750E9D8A8D22B6AA8D86C85BF3D0' |
+				+------------------------------------------------------------------------------------------------------+
+				1 row in set (0.00 sec)
+
+				-------------------------------------------------
+
+		DROP USER 'USERNAME'@'HOST'
+
+		jerry@localhost 和jerry@127.0.0.1 不是一个用户
+
+		HOST
+			IP;
+			HOSTNAME;
+			NETWORK;
+			通配符
+				_：匹配任意的那个字符,172.16.0._
+				%: 匹配任意字符；[jerry@'%' 表示所有字符]
+
+	DCL
+		GRANT
+		REVOKE
+		#用户不存在则创建
+		GRANT pri1,pri2,...ON DB_NAME.TB_NAME TO 'USERNAME'@'HOST' [IDENTIFIED BY 'PASSWORD']; 
+			GRANT ALL PRIVILEGES ON MYDB2 TO 'jerry'@'%';
+			SHOW GRANTS FOR 'jerry'@'%';
+			-------------------------------------
+			mysql> SHOW GRANTS FOR 'jerry'@'%';
+			+------------------------------------------------------------------------------------------------------+
+			| Grants for jerry@%                                                                                   |
+			+------------------------------------------------------------------------------------------------------+
+			| GRANT USAGE ON *.* TO 'jerry'@'%' IDENTIFIED BY PASSWORD '*09FB9E6E2AA0750E9D8A8D22B6AA8D86C85BF3D0' |
+			| GRANT ALL PRIVILEGES ON `MYDB2`.`MYDB2` TO 'jerry'@'%'                                               |
+			+------------------------------------------------------------------------------------------------------+
+			2 rows in set (0.00 sec)
+
+			-------------------------------------
+
+		REVOKE pri1,pri2,... ON DB_NAME.TB_NAME FROM 'USERNAME'@'HOST';
+
+		/etc/init.d/mysqld start
+		chkconfig --level 345 mysqld on
+		关闭防火墙
+		关闭selinux
+
+		远程连接数据库
+		mysql -u jerry -p -h 10.100.13.130
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
