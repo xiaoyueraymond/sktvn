@@ -219,22 +219,3 @@ data blocks changed from 13107200 to 39336960
 ------------------------------------------------------------------------------------------
 
 
-项目名字:
-public_warehouse_admin
-项目环境:
- 测试环境
-地址:
-git@gitlab.haitun.kokoerp.com:php/public_warehouse_admin.git
-宿主机
-代码检出仓库
-/www
-排除文件
-机器列表
-用户
-www
-webroot
-/data/www/public_warehouse_admin
-发布版本库
-/data/release/public_warehouse_admin
-机器列表
-192.168.8.239

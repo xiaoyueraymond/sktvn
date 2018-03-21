@@ -21,7 +21,7 @@ xiaoding = DingtalkChatbot(webhook)
 #xiaoding.send_text(msg='i am dingding robert', is_at_all=True)
 url = 'http://www.haitun.hk/'
 
-at_mobiles = ['+86-18576736095']
+at_mobiles = ['+86-18576736666']
 #xiaoding.send_text(msg='i am dingding robert!', at_mobiles=at_mobiles)
  
 def get_server_status(url):

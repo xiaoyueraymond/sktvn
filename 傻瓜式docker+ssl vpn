@@ -19,12 +19,6 @@ Password for user is: wLpcBqfwCnnko8XvzCHF
 #进入正在运行的docker
 docker exec -it ipsec-vpn-server /bin/bash
 
-113.98.247.81
-账号 
-chenweiyuan
-预共享秘钥如下
-9Ea6TYFEzUNxnRFqRiE7khfYFsXKWm
-密码wLpcBqfwCnnko8XvzCHF
 
 
 
