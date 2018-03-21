@@ -62,8 +62,8 @@ DBMS：
 
 			服务器命令
 				必须使用语句结束符，默认是分号;
-				SHOW DATABASES; [区分大小写]
-
+				SHOW DATABASES; [数据库区分大小写,根据系统设定]
+				#查询有哪些数据库
 				mysql> SHOW DATABASES;
 
 				+--------------------+
@@ -169,6 +169,7 @@ DBMS：
 		SHOW DATABASES;
 		CREATE DATABASE IF NOT EXISTS db_name;
 
+		#删除表
 		DROP DATABASE db_name;
 		SHOW DATABASES;
 
@@ -178,8 +179,9 @@ DBMS：
 		USE mydb;  
 
 		CRETE DATABASE mydb2;
-		#设置默认数据库mydb2
+		#设置默认数据库mydb2，并进入数据库
 		USE mydb2;
+		#创建一个表，字段有【姓名，年龄，性别】
 		#             表名studnets  名字 20个字符串 不能为空 年龄 小整形		
 		CREATE TABLE students(Name CHAR(20) NOT NULL,AGE TINYINT UNSIGNED,Gender CHAR(1) NOT NULL);
 
@@ -213,8 +215,10 @@ DBMS：
 			ADD
 			DROP
 
+			#修改表，为这个表添加字段【课程course】
 			ALTER  TABLE students ADD course VARCHAR(100);
 			-------------------------------------------------------
+			#查看表结构
 			mysql> DESC students;
 			+---------+---------------------+------+-----+---------+-------+
 			| Field   | Type                | Null | Key | Default | Extra |
@@ -227,9 +231,9 @@ DBMS：
 			4 rows in set (0.00 sec)
 
 			----------------------------------------------------------------
-
+			#查看表结构
 			DESC students
-
+			#修改字段    表名    关键字 旧字段 新字段  字段类型    关键字 在名字字段后面
 			ALTER TABLE students CHANGE course Course VARCHAR(100) AFTER Name;
 			----------------------------------------------------------------
 			mysql> DESC students;
@@ -263,19 +267,26 @@ DBMS：
 
 	DML:
 		INSERT INTO
+		    #填充数据
 			INSERT INTO tb_name(col1,col2,''') VALUES('STRING',NUM,''')
-			INSERT INTO students(Name,Gender) VALUES('LingHuchong','M'),('XiaoLongNv','F');
+			#    关键字  表名     字段名       关键字    数据1    数据1   数据2      数据2
+	 		INSERT INTO students(Name,Gender) VALUES('LingHuchong','M'),('XiaoLongNv','F');
 
 
+            #查询整个表的数据
+			SELECT * FROM students;’
 
-			SELECT * FROM students;
+			#一次性填充所有数据
+			#填充数据    表名    关键字    数据3       数据3
 			INSERT INTO students VALUES('XiaoXiangzi','HaMaGong',57,'M');
 
+		#修改表里面的数据 把xiaoxiangzi的课程修改为蛤蟆功
 		UPDATE tb_name SET column='value' WHERE Name='字段名'
-			UPDATE students SET Courese='Hamogong' WHERE Name='Xiaoxiangzi';
+			#关键字 表名    关键字 需要修改的字段 关键字   需要修改的对象
+			UPDATE students SET Course='Hamogong' WHERE Name='Xiaoxiangzi';
 			----------------------------------------------------------------
 
-			Database changed
+			#查询整个表格
 			mysql> SELECT * FROM students;
 			+-------------+----------+------+--------+
 			| Name        | Course   | AGE  | Gender |
@@ -292,8 +303,15 @@ DBMS：
 		选择[指定以某字段作为搜索码,筛选符合条件的行]
 		投影[显示出需要的部分]
 
+
+
 		SELECT Name,Course FROM students;
+		#显示(投影)性别为男的所有人名字和课程
 		SELECT Name,Course FROM students WHERE  Gender='M';
+		
+		#把令狐冲的课程修改为辟邪剑法
+		#把小龙女的课程修改为玉女心经
+		#关键字 表名  关键字   需要修改的字段       需要需改的对象
 		UPDATE students SET Course='pixiejianpu' WHERE Name='Linghuchong';
 		UPDATE students SET Course='yunvxinjing' WHERE Name='xiaolongnv';
 
@@ -304,16 +322,25 @@ DBMS：
 		REPLACE INTO 
 
 		删除
-
+     
 		DELETE FROM tb_name WHERE CONDITION;
+
+		#删除所有课程为辟邪剑法的数据
+
+		#关键字      表名    关键字  字段
 		DELETE FROM students WHERE Course='pixiejianfa';
 
 		创建用户
 		CREATE USER 'USERNAME'@'HOST' IDENTIFIED BY 'PASSWD';
+			
+			#创建用户jerry允许在所有ip登陆，密码为jerry ，默认为只有登陆的权限
 			CREATE USER 'jerry'@'%' IDENTIFIED BY 'jerry';
 
 		#查看用户授权
 			SHOW GRANTS FOR 'USERNAME'@'HOST'
+
+			    #查看jerry的权限
+
 				SHOW GRANT FOR 'jerry'@'%';
 				-------------------------------------------------
 				right syntax to use near 'GRANT FOR 'jerry'@'%'' at line 1
@@ -343,8 +370,16 @@ DBMS：
 		GRANT
 		REVOKE
 		#用户不存在则创建
+		#授权 
+
 		GRANT pri1,pri2,...ON DB_NAME.TB_NAME TO 'USERNAME'@'HOST' [IDENTIFIED BY 'PASSWORD']; 
+		    #关键字    所有权限     数据库名字  授权对象
 			GRANT ALL PRIVILEGES ON MYDB2 TO 'jerry'@'%';
+
+			#查看授权 默认
+			SHOW GRANTS;
+
+			#查看授权
 			SHOW GRANTS FOR 'jerry'@'%';
 			-------------------------------------
 			mysql> SHOW GRANTS FOR 'jerry'@'%';
@@ -358,6 +393,7 @@ DBMS：
 
 			-------------------------------------
 
+		#取消权限  权限          数据库.表            取消权限的对象             
 		REVOKE pri1,pri2,... ON DB_NAME.TB_NAME FROM 'USERNAME'@'HOST';
 
 		/etc/init.d/mysqld start
