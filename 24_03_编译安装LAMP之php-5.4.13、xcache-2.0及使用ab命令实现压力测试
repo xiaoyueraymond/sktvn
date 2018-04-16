@@ -1,0 +1,289 @@
+24_03_编译安装LAMP之php-5.4.13、xcache-2.0及使用ab命令实现压力测试
+	【安装路径】
+	chmod +x  /etc/rc.d/rc.local
+	vi /etc/rc.d/rc.local  --开机启动
+	/usr/local/apache/bin/httpd
+
+
+	/usr/local/php/bin 		--命令行工具
+	/usr/local/php/php/man  --帮助手册
+
+	安装成模块
+	libtool: install: install .libs/libphp5.so /usr/local/apache/modules/libphp5.so
+	chmod 755 /usr/local/apache/modules/libphp5.so
+ 
+ 	 --with-config-file-path=/etc 编译的时候指定配置文件路径
+ 	 cp /usr/local/php-5.4.13/php.ini-production /etc/php.ini
+ 	 	分段式配置说明
+
+
+ 	安装完成后需要调试apache和php结合
+ 	修改apache的配置文件
+ 		vi /etc/httpd/httpd.conf
+			LoadModule php5_module modules/libphp5.so
+ 			#处理.php文件
+ 			AddType application/x-httpd-php  .php
+ 			AddType application/x-httpd-php-source  .phps
+ 			DirectoryIndex index.php index.html
+ 		大写G飞到末尾
+ 			启动下面的要同时启用ssl模块
+ 			#Include /etc/httpd/extra/httpd-ssl.conf
+ 			/usr/local/apache/bin/httpd 
+ 			netstat -tlunp
+ 		:337 飞到337行
+ 		修改httpd的php启动页面
+ 			vi /usr/local/apache/htdocs/index.php
+ 		修复中文显示乱码
+ 			vi /etc/httpd/httpd.conf 			
+	 			AddDefaultCharset gb2312
+				AddDefaultCharset UTF-8
+		配置mysql用户
+			mysql
+			SELECT User, Host, Password FROM mysql.user;
+			GRANT ALL PRIVILEGES ON *.* TO 'abcd'@'localhost' IDENTIFIED BY '123';
+			FLUSH PRIVILEGES;
+ 			
+【php扩展】xcache：
+		
+		php加载扩展
+		XCache 2.0.0源码包，tar.gz（md5）/ tar.bz2（md5） http://xcache.lighttpd.net/wiki/Release-2.0.0
+		cd /usr/local/
+	    tar zxvf xcache-2.0.0.tar.gz
+		cd /usr/local/xcache-2.0.0
+		/usr/local/php/bin/phpize
+		./configure --with-php-config=/usr/local/php/bin/php-config  --enable-xcache
+		make
+		make install
+			Installing shared extensions:     /usr/local/php/lib/php/extensions/no-debug-zts-20100525/
+		-rw-r--r-- 1 1001  513   2642 Apr 20  2012 xcache.ini
+		mkdir -p /etc/php.d
+		cp /usr/local/xcache-2.0.0/xcache.ini /etc/php.d/
+		
+		vi /etc/php.d/xcache.ini 
+		;; install as zend extension (recommended), normally "$extension_dir/xcache.so"
+		修改如下
+		zend_extension = /usr/local/php/lib/php/extensions/no-debug-zts-20100525/xcache.so
+		; zend_extension_ts = /usr/local/lib/php/extensions/non-debug-zts-xxx/xcache.so
+		注释此条，因为这是windows的配置文件
+		;; For windows users, replace xcache.so with php_xcache.dll
+		;zend_extension_ts = c:/php/extensions/php_xcache.dll
+
+		xcache.shm_scheme =        "mmap" 内存映射
+		xcache.gc_interval =  			  垃圾扫描
+		to disable: xcache.size=0  		  禁用
+
+
+		/usr/local/apache/bin/apachectl restart
+
+【启动虚拟主机】
+	1.禁用中心主机
+		vi /etc/httpd/httpd.conf 默认日志路径/usr/local/apache/logs/
+			DocumentRoot "/usr/local/apache/htdocs"   →  #DocumentRoot "/usr/local/apache/htdocs"
+			#Include /etc/httpd/extra/httpd-vhosts.conf → Include /etc/httpd/extra/httpd-vhosts.conf
+		
+		vi 	/etc/httpd/extra/httpd-vhosts.conf
+			# Required modules: mod_log_config
+			vi /etc/httpd/httpd.conf
+			默认已经启动mod_log
+			LoadModule log_config_module modules/mod_log_config.so
+
+		 mkdir /www/{a.org,b.net} -pv	
+			-p: will also create all directories leading up to the given directory that do not exist already. If the given directory already exists, ignore the error.
+            -v：显示mkdir创建的每个目录。通常与-p配合使用。
+		
+        mkdir -pv /var/log/httpd
+		vi 	/etc/httpd/extra/httpd-vhosts.conf
+			<VirtualHost *:80>
+			 	#空  → S
+			 	#dd 删除整行
+			 	#yy 复制整行 p 粘贴
+			 	#u 撤销 ctrl + r 恢复
+			    ServerName www.a.org
+			    DocumentRoot "/www/a.org"
+			    ErrorLog "/var/log/httpd/a.org-error_log"
+			    CustomLog "/var/log/httpd/a.org-access_log" combined
+			</VirtualHost>
+			<VirtualHost *:80>
+			    ServerName www.b.net
+			    DocumentRoot "/www/b.net"
+			    ErrorLog "/var/log/httpd/b.net-error_log"
+			    CustomLog "/var/log/httpd/b.net-access_log" common
+			</VirtualHost>
+
+			vi /www/a.org/index.html
+				<html>
+				<body>
+				<h1>
+				        this is the /www/a.org/index.html
+
+				        :∴★∵* * ☆．∴★∵*★·'☆°·'☆°
+				∴█████．☆．∵★∵∴☆·'☆°
+				☆█田█田█．* ☆．∴°··°．·'°∴★∵
+				∵█田█田█．★∵∴☆．★∵∴·'☆°
+				 
+				╭∞━━━╮.oо◎
+				┃ ┃
+				┃● ●┃
+				┃﹋ ε ﹋ ┃
+				○━━━━╯
+
+				</h1>
+				</body>
+				</html>
+
+		vi /www/b.net/index.html
+				<html>
+				<body>
+				<h1>
+				        this is the vi /www/b.net/index.html
+				一盏离愁 孤单伫立在窗口 我在门后 
+				假装你人还没走 旧地如重游 月圆更寂寞 
+				夜半清醒的烛火 不忍苛责我 一壶漂泊 
+				浪迹天涯难入喉 你走之后 酒暖回忆思念瘦 
+				水向东流 时间怎么偷 花就一次成熟 我却错过 
+				谁在用琵琶弹奏 一曲东风破 
+				岁月再墙上剥落 看见小时候 
+				犹记得那年我们都还很年又 而如今琴声幽幽 
+
+				</h1>
+				</body>
+				</html>
+
+		--You don't have permission to access / on this server.
+		cat /etc/httpd/httpd.conf | less
+		------------------------------------------------------
+			DocumentRoot "/usr/local/apache/htdocs"
+			<Directory "/usr/local/apache/htdocs">
+				AllowOverride None
+				Require all granted #允许所有人访问
+				</Directory>
+		-------------------------------------------------------
+
+		vi /etc/httpd/extra/httpd-vhosts.conf
+
+
+			<VirtualHost *:80>
+			 	#空  → S
+			 	#dd 删除整行
+			 	#yy 复制整行 p 粘贴
+			 	#u 撤销 ctrl + r 恢复
+			    ServerAdmin www.a.org
+			    DocumentRoot "/www/a.org"
+			    ErrorLog "/var/log/httpd/a.org-error_log"
+			    CustomLog "/var/log/httpd/a.org-access_log" combined
+				<Directory "/www/a.org">
+					Options none
+					AllowOverride none
+					#允许所有人访问
+					Require all granted 
+				</Directory>
+			</VirtualHost>
+			<VirtualHost *:80>
+			    ServerAdmin www.b.net
+			    DocumentRoot "/www/b.net"
+			    ErrorLog "/var/log/httpd/b.net-error_log"
+			    CustomLog "/var/log/httpd/b.net-access_log" common
+				<Directory "/www/b.net">
+					Options none
+					AllowOverride none
+					#允许所有人访问
+					Require all granted 
+				</Directory>			    
+			</VirtualHost>
+
+	【压力测试】
+		/usr/local/apahce/bin/ab
+			ab=apache benchmark
+			-C 一次并发数
+			-n 总数
+
+    	vim /etc/hosts
+    		#shift 4  跳到行尾
+				10.100.13.135 www.a.org
+				10.100.13.135 www.b.net
+
+    	 /usr/local/apache/bin/ab -c 10 -n 100 http://www.a.org/index.html
+
+    	----------------------------------------------
+		Server Software:        Apache/2.4.4 #测试服务器软件和版本
+		Server Hostname:        www.a.org
+		Server Port:            80
+ 
+		Document Path:          /index.html                  #请求的文件
+		Document Length:        461 bytes                    #请求的文件大小
+
+		Concurrency Level:      10
+		Time taken for tests:   0.012 seconds 总时长         #第一个报文开始到最后一个报文响应的时间
+		Complete requests:      100
+		Failed requests:        0
+		Write errors:           0
+		Total transferred:      73200 bytes					  #100个请求 包括TCP/IP封装帧头和html的大小
+		HTML transferred:       46100 bytes					  #100个请求 仅仅html的大小
+		Requests per second:    8320.16 [#/sec] (mean)        #平均1秒钟请求数
+		Time per request:       1.202 [ms] (mean)                                 #1次并发完成的时长（10并发）
+		Time per request:       0.120 [ms] (mean, across all concurrent requests) #10并发里面的1并发的时间
+		Transfer rate:          5947.61 [Kbytes/sec] received #传送速率
+
+		Connection Times (ms)
+		----------------------------------------------
+		/usr/local/apache/bin/ab -c 100 -n 100 http://www.a.org/index.html
+		/usr/local/apache/bin/ab -c 500 -n 1000 http://www.a.org/index.html
+		#忽略错误
+		/usr/local/apache/bin/ab -r -c 2000 -n 10000 http://www.a.org/index.html
+		#每个进程只能打开1024个文件，修改为10000个
+		 ulimit -n 10000
+		 #查看套接字文件
+		 netstat -an 
+
+		 [root@centos6 apache]#  ls -lh /var/log
+		 -rw-------. 1 root  root  317K Mar 25 03:35 messages-20180325
+		 cp /var/log/messages-20180325 /www/a.org/test.html
+		/usr/local/apache/bin/ab -r -c 2000 -n 10000 http://www.a.org/test.html
+		ps aux |grep httpd
+			event模型
+			mpm_event_module (shared)
+
+		dd if=/dev/zero of=/www/a.org/test2.html bs=1M count=2
+		phpMyAdmin-3.5.1-all-languages.tar.bz2 https://www.phpmyadmin.net/files/3.5.1/
+		tar -xvf /usr/local/phpMyAdmin-3.5.1-all-languages.tar.bz2 -C /www/b.net
+		cd /www/b.net/
+		mv phpMyAdmin-3.5.1-all-languages/ pma/
+		生成密码
+			openssl rand -hex 11
+				1465480dcb490d6144da95
+			openssl rand -base64 10
+
+		配置文件config.sample.inc.php
+			 cp config.sample.inc.php config.sample.php 
+			 vi config.sample.php
+			 	$cfg['blowfish_secret'] = 'a8b7c6d'; /* YOU MUST FILL IN THIS FOR COOKIE AUTH! */
+→ 
+		配置apche vi /etc/httpd/httpd.conf
+		   	 添加：ServerName  localhost:80
+
+		mysqladmin -uroot password '123'
+		mysqladmin -uroot -p flush-privileges
+		/usr/local/apache/bin/ab -r -c 1 -n 10 http://www.b.net/pma/index.php
+
+	【压力测试工具】
+		ab
+		http_load
+		webbench
+		siege
+
+	【https功能】
+		vi etc/	
+			#LoadModule ssl_module modules/mod_ssl.so → LoadModule ssl_module modules/mod_ssl.so
+			#Include /etc/httpd/extra/httpd-ssl.conf  → Include /etc/httpd/extra/httpd-ssl.conf
+
+		 vi /etc/httpd/extra/httpd-ssl.conf
+		 	DocumentRoot "/www/a.org"
+			ServerName www.a.org
+
+		ssl一个ip地址只能建立一个主机，创建ca证书
+
+		vmstat 1
+ 
+
+
+

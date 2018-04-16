@@ -1,0 +1,198 @@
+24_01_编译安装LAMP之httpd-2.4.4
+	PHP:脚本编程语言,php解释器
+		WebApp：面向对象的特性
+				Zend:
+					第一段：词法分析,语法分析,编译为Opcode
+						opcode放置于内存中
+					第二段：执行opcode
+
+				PHP 缓存器
+					APC
+					eAccelerator
+					XCache
+
+				PHP解释器-->Mysql，如何交互？
+				 	bash：a.sh
+				 	php-mysql 驱动程序,php连接mysql
+
+				 	web服务器仅能解释静态文件
+
+				 	index.PHP 需要php解释器执行
+				 		httpd 和 php交互方式
+				 				cgi进程 ---> （httpd进程响应--cgi协议，启动cgi进程，cgi进程结果返回给httpd，httpd负责cgi的创建和销毁。） 
+				 				Moudle  ---> （httpd进程调用php模块，不需要启动新进程）---模块便于管理--性能受限
+				 				fast cgi（cgi）--->  (php服务器负责创建多个进程) 9000端口
+
+				 	web服务器--应用程序(PHP)服务器--数据库(MYSQL)服务器
+
+				 	index.php[里面有动态请求,也有有静态请求]
+				 		web object
+				 			<?php
+				 			?>
+
+				 	Xcache
+				 		当多个动态请求的内容相同时，第一次请求存储在Xcache中,第二次php请求直接去Xcache中读取内容，不需要再次编译请求，
+
+				 	PHP编译--执行--执行结果返回给httpd
+				 		php执行结果返回给httpd,缓存为静态---动态内容静态化
+				 		淘宝97%内容静态化---缓存在CDN中
+
+
+				 	不需要任何文档,安装各种模块
+
+		【LAMP:】---需要定制的一种平台
+			httpd
+			php53
+			php53-mysql
+			mysql-server
+
+		编译配置LAMP:
+			Linux,Apache,MySQL,PHP(Python,Perl)
+
+Apache:ASF(apache 软件基金会),httpd,tomcat,cloudware
+			httpd:2.4.4
+			php:5.4.13
+			MySQL:5.6.10(rpm,通用二进制,源码)
+
+			【安装顺序】
+				httpd --> MySQL --> php --> XCache
+			  【C开发】
+			    httpd apr：Apache Portale Runtime
+			    	windows apr
+			    	linux apr
+			    	通过apr让httpd在不通系统版本运行
+			    	[多版本并行]
+
+		rpm
+			/bin 、/sbin 、/usr/bi 、/usr/sbin ---[二进制程序]
+			/lib 、/usr/lib					-----	【库文件】
+			/etc							------ 【配置文件】
+			/usr/share(doc,man)				------【帮助文档】
+
+		编译安装
+			/usr/local                          ----【安装路径】
+				/bin ，sbin
+				/etc
+				share/(doc,man)
+
+
+			/usr/local/arp
+				bin,sbin,lib,include,ec, share/man
+				[sbin] [库] [配置文件]
+
+
+		 
+		apache 2.4.4 http://archive.apache.org/dist/httpd/
+		tar   -jxvf  xxx.bz2
+		apr1.4.6 --> apr-util -->httpd
+		apr1.4.6 [http://download.chinaunix.net/download.php?id=37842&ResourceID=470]
+		apr1.6.3 apr-util-1.6.1.tar.bz2 [http://apr.apache.org/download.cgi]
+
+		3.安装apr
+		    mkdir -p /usr/local/apr/
+		    mkdir -p /usr/local/arp-tuil
+			安装库文件
+			[yum -y install gcc gcc-c++ autoconf libxml2 libxml2-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers]
+			【yum groupinstall "Development Tools" "Server Platform Development" -y】
+
+			tar  -jxvf    apr-1.6.3.tar.gz
+			cd /usr/local/apr-1.6.3
+			./configure  --prefix=/usr/local/apr/
+			----------------------------------------------------------------------
+			config.status: include/arch/unix/apr_private.h is unchanged
+				解决方法：
+				直接打开/usr/local/src/apr-1.5.1/configure  把 $RM "$cfgfile" 那行删除掉 
+				$RM “$cfgfile”  大约在 42302 行
+				然后再重新运行  ./configure  --prefix=/usr/local/apr  就可以了
+				[root@bes2 apr-1.5.1]# make            ——编译
+				[root@bes2 apr-1.5.1]# make install               ——安装
+			----------------------------------------------------------------------
+			make & make install
+
+			4.安装apr-util
+			tar  -jxvf  apr-util-1.6.1.tar.bz2
+			cd /usr/local/apr-util-1.6.1
+			./configure  --prefix=/usr/local/apr-util   --with-apr=/usr/local/apr
+			报错[yum install expat-devel-2.0.1-13.el6_8.x86_64.rpm -y ]
+			make & make install
+
+
+		MPM:prefork,worker,event(默认是event)
+			2.4.4模块化方式使用这3种方式
+			worker,event---需要编译2次php
+
+		hwclock -s [软件时间同步到硬件时间] 
+		mkdir -p /usr/local/apache
+		cd /usr/local/httpd-2.4.4
+		./configure --prefix=/usr/local/apache --sysconfdir=/etc/httpd --enable-so --enable--rewirte --enable-ssl --enable-ssl --enable-cgi  --enable-cgid  --enable-modules=most  -enable-mods-share=most  --enable-mpms-shared=all --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util
+		报错[yum -y install pcre-devel]
+		make & make install
+
+		启动
+		/usr/local/apache/bin/apachectl start
+		默认网页页面位置
+		/usr/local/apache/htdocs
+		加入开机豪华套餐
+			方案一
+				cp /usr/local/apache/bin/apachectl /etc/rc.d/init.d/httpd
+				这样就可以
+				service httpd start
+				chkconfig --add httpd
+				chkconfig httpd on
+			方案二
+				vi /etc/rc.d/rc.local  --开机启动
+				/usr/local/apache/bin/httpd				
+
+		-----------------------------------
+		[root@centos6 apache]# pwd
+		/usr/local/apache
+		[root@centos6 apache]# ll
+		total 52
+		drwxr-xr-x  2 root root  4096 Mar 28 14:29 bin
+		drwxr-xr-x  2 root root  4096 Mar 28 14:29 build
+		drwxr-xr-x  2 root root  4096 Mar 28 14:29 cgi-bin
+		drwxr-xr-x  3 root root  4096 Mar 28 14:29 error
+		drwxr-xr-x  2 root root  4096 Mar 28 14:11 htdocs
+		drwxr-xr-x  3 root root  4096 Mar 28 14:29 icons
+		drwxr-xr-x  2 root root  4096 Mar 28 14:29 include
+		drwxr-xr-x  2 root root  4096 Mar 28 14:34 logs
+		drwxr-xr-x  4 root root  4096 Mar 28 14:29 man
+		drwxr-xr-x 14 root root 12288 Feb 19  2013 manual
+		drwxr-xr-x  2 root root  4096 Mar 28 14:29 modules
+		[root@centos6 apache]# 
+
+		-----------------------------------
+		配置文件路径：
+		/etc/httpd/httpd.conf
+
+		vi /etc/httpd/httpd.conf
+		PidFile "/var/run/http.pid"
+
+		添加帮助手册
+		vim /etc/man.configure
+			 ab - Apache HTTP server benchmarking tool
+    		 添加 MAN PATH /usr/local/apache/man
+    		 	-c 并发量20
+    		 	-n 请求个数100
+    		 	100 / 2 = 5  
+
+    	vim /etc/hosts
+    		#shift 4  跳到行尾
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,6 +6,9 @@ git commit -m "update"
 git push -u origin master
 git push -u git master
 
+git flow详解
+https://v.youku.com/v_show/id_XMzM0MjE1ODM0MA==.html?spm=a2h0k.8191407.0.0&from=s1.8-1-1.2
+
 
 C:\Users\125C01062801\Desktop\learn\马哥linux>git remote -v
 git     https://github.com/xiaoyueraymond/sktvn.git (fetch)

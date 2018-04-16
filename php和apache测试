@@ -1,0 +1,67 @@
+  cd /var/www/html
+  touch test.php
+  vi test.php
+
+php 测试页面
+
+ <?php
+  echo "<title>Test Page</title>";
+  phpinfo()
+  ?>
+
+
+[root@centos6 ~]# php -version
+PHP 5.3.3 (cli) (built: Mar 22 2017 12:27:09) 
+Copyright (c) 1997-2010 The PHP Group
+Zend Engine v2.3.0, Copyright (c) 1998-2010 Zend Technologies
+
+yum install -y php
+yun install -y apache
+
+#测试php页面
+ vi /var/www/html/phpinfo.php
+<?php echo phpinfo(); ?> 
+
+ 在linux上yum安装phpmyadmin
+ https://blog.csdn.net/kwu_ganymede/article/details/53522663
+ ------------------------------------------------------------
+ yum安装phpMyAdmin
+
+
+
+1、yum安装相关软件
+
+[plain] view plain copy
+yum install httpd httpd-devel   
+  
+yum install php php-mysql php-common php-gd php-mbstring php-mcrypt php-devel php-xml   
+  
+yum install epel-release  
+  
+yum install phpmyadmin  
+
+
+2、配置mysql主机
+
+/etc/phpMyAdmin/config.inc.php
+
+[plain] view plain copy
+$cfg['Servers'][$i]['host']          = 'mysqlDB';  
+
+
+3、配置访问权限
+
+/etc/httpd/conf.d/phpmyadmin.conf
+
+
+[html] view plain copy
+<Directory /usr/share/phpMyAdmin/>  
+   Order Deny,Allow  
+   Deny  from All  
+   Allow from 127.0.0.1  
+   Allow from ipaddress  
+</Directory>  
+
+重启
+service htttpd restart
+ ------------------------------------------------------------

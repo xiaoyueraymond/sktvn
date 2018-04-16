@@ -1,0 +1,383 @@
+24_02_编译安装LAMP之MySQL-5.5.28(通用二进制格式)
+
+非登录用户
+useradd -r mysql
+mysql-5.5.59-linux-glibc2.12-x86_64.tar.gz【https://dev.mysql.com/downloads/file/?id=474478】
+tar xf mysql-5.5.59-linux-glibc2.12-x86_64.tar.gz -C /usr/local
+ln -sv mysql-5.5.59-linux-glibc2.12-x86_64 mysql
+/usr/local/mysql 安装说明-rw-r--r--  1 7161 31415   301 Nov 27 20:03 INSTALL-BINARY
+#改变属主
+chown -R mysql.mysql /usr/local/mysql/*
+cd /usr/local/mysql
+ll
+ls scripts/
+scripts/mysql_install_db --help
+#rpm包安装的数据库数据库数据存放路径var/lib/mysql
+#mysql数据放在独立的分区上，独立的逻辑卷上--datadir
+#建立逻辑卷
+Linux系统下创建LV（逻辑卷）并挂载【https://jingyan.baidu.com/article/6079ad0e9d7d9e28fe86db11.html】
+
+fdisk /dev/sda
+ 	1.查看现有磁盘情况，是否有这块磁盘
+ 	    mkfs.ext4 /dev/sdb 格式化磁盘
+ 	2.对磁盘sdb进行分区：fdisk /dev/sdb
+ 		p 查看分区
+ 		n 新建分区
+ 		1 第一个主分区
+ 		1 默认柱面1
+ 		+2G 分配2G的柱面
+ 		p 查看分区
+ 	3.把分区改为LVM 格式【改变系统标识符】
+ 		L 查看对应属性
+ 		8e 改变分区1为 Linux LVM格式
+ 		p 查看分区
+ 		w 保存退出
+
+ 	4.使kernel重新读取分区表partprobe
+ 		yum -y install parted
+
+ 	5.【分区,硬盘】  →  【物理卷PV】→ 【卷组VG】  → 【逻辑卷LV】
+ 		创建物理卷pvcreate /dev/sdb1
+ 		查看物理卷pvdisplay
+ 		查看物理卷pvs
+
+ 		创建PV:
+
+		扫面系统PV：pvscan
+		创建PV：pvcreate /dev/sdb1
+		查看PV：pvdisplay
+		这样我们就创建了一个 4.98G的PV，注意 Allocatable 为 NO
+
+		创建 VG:
+		扫面系统VG：vgscan
+		创建VG：vgcreate vg_test /dev/sdb1
+		查看VG：vgdisplay
+
+		这样我们就创建了一个 4.98G（1274 个PE，要记住这个数字）的VG（名字为vg_test）
+		Linux系统下创建LV（逻辑卷）并挂载
+
+		创建LV:
+		扫面系统LV：lvscan
+		创建LV：lvcreate -l 1274 -n lv_test vg_test （1274是VG中PE的个数）
+		查看LV：lvdisplay
+		这样我们就创建了一个名字为 lv_test 的LV
+
+		Linux系统下创建LV（逻辑卷）并挂载
+		格式化刚刚创建的LV
+		命令：mkfs -t ext4 /dev/vg_test/lv_test
+
+		Linux系统下创建LV（逻辑卷）并挂载
+		创建目录并挂载
+		创建目录：mkdir /test
+		挂载：mount /dev/vg_test/lv_test /test
+
+		查看：df -h
+		我们发现系统已经挂载了刚刚创建的LV
+		Linux系统下创建LV（逻辑卷）并挂载
+		还有最后一步，设置开机挂载
+		将 /dev/mapper/vg_test-lv_test /test     ext4    defaults        1 2 写入 /etc/fstab
+
+		mount -a 查看是否挂载成功
+
+		至此，大功告成！
+		欲知如何增加LV容量，且待下回分享~~
+
+		马哥LVM讲解【http://v.youku.com/v_show/id_XMzQ5MDQxNDg4NA==.html?spm=a2hzp.8253869.0.0】
+        兄弟连linux分区挂载https://study.163.com/course/courseLearn.htm?courseId=1097084#/learn/video?lessonId=1312417&courseId=1097084
+		
+		分区：https://study.163.com/course/courseLearn.htm?courseId=1097084#/learn/video?lessonId=1308284&courseId=1097084
+		LVM：logical Volume Manager
+
+		dev：device mapper：将一个或多个底层设备组织成一个逻辑设备的模块；dm
+
+		/dev/mapper/VG_NAME-LV_NAME
+			/dev/mapper/vol0-root
+		/dev/VG_NAME/LV_NAME
+			/dev/vol0/root
+
+		[root@centos6 ~]# cat /etc/centos-release 
+			CentOS release 6.5 (Final)
+
+
+		【物理卷】PV管理工具
+			pvs：简要pv信息显示
+			pvdisplay: 详细信息pv信息 + dev/sda3
+			pvcreate /dev/sda3
+			pvremove /dev/sda3 删除PV
+
+		【卷组】VG管理工具
+			vgs
+			vgdisplay
+			vgcreate myvg /dev/sda3
+			vg -s 指定PE大小
+			vgextend myvg /dev/sda5扩展VG
+			vgreduce 删除
+
+		【逻辑卷】LV管理工具
+			lvs
+			lvdisplay
+			lvcreat 
+				-L 逻辑卷大小M G T
+				-n 逻辑卷名字
+				-l 逻辑盘区【PE】数量
+				   指定卷组 VolumnGroup
+				   指定卷组中的物理卷
+
+		    lvcreate -L 2G -n mylv myvg
+
+		 【查看】ls /dev/mapper/
+		 	#格式化
+		 	mke2fs -t ex4 -b 1024 -L MYLV /dev/myvg/mylv
+		 	#创建挂载目录
+		 	mkdir /backup
+		 	#挂载
+		 	mount /dev/myvg/mylv /backup/
+		 	#查看挂载
+		 	mount
+
+		  【扩展逻辑卷】（必须先扩展逻辑卷的物理边界，再扩展逻辑边界）
+		  	lvextend扩展逻辑卷的物理边界
+		  	         -L 【扩展到多少】指定逻辑卷大小M G T  /dev/VG_NAME/LV_NAME
+		  	         +  【表示增加多少】
+
+		  	 resize2fs扩展逻辑卷的物理边界       
+		  	 resize2fs /dev/VG_NAME/LV_NAME
+		  	 8.扩展逻辑卷
+				 lvextend -L +8G /dev/mapper/VolGroup-lv_root
+      			resize2fs /dev/mapper/VolGroup-lv_root
+
+		  【缩减逻辑卷】不建议缩减
+		    #umount /dev/VG_NAME/LV_NAME
+		    #文件系统强制检测和修复
+		    e2fsck -f /dev/VG_NAME/LV_NAME M G T 逻辑缩减到多少大小M G T
+		    resize2fs /dev/VG_NAME/LV_NAME 
+		    lvreduce -L 
+		    			 /dev/VG_NAME/LV_NAME    物理缩减到多少大小M G T
+		    		  -  M G T  				 物理减少多少
+		    #重新挂载并使用
+		    mount /dev/myvg/mylv /backup/
+
+		    yum install -y parted
+		    分区保存后必用partprobe
+		    格式化分区mkfs -t ext4 /dev/sdb1
+		    			   -t 指定格式化格式
+
+
+		    #df    命令
+		    #mount 命令 查看挂载情况
+		    自动挂载分区，写入挂载文件/etc/fstab
+		    第一字段  分区设备文件名 uuid【分区唯一ID号】
+		    第二字段  挂载点
+		    第三字段  件格式
+		    第四字段  默认挂载权限
+		    第五字段  分区是否备份 0 不备份 1备份 2 不定期备份
+		    第六字段  扫描优先级 分区是否被fsck 0不检测  优先级最大为1
+		    分区自动备份保存位置lostfound
+
+		    查看新分区的UUID 
+		    dumpe2fs -h /dev/sdb1
+		    			设备文件名
+		    			dumpe2fs -h /dev/mapper/vg_test-lv_test
+		    			Filesystem UUID:          0d5276f7-9976-4439-8490-0cb4a2546e6c
+		    			Filesystem UUID:          698ba6d1-b88e-4ee9-9501-65fa40879d68
+		    			80efd1b1-e45e-4347-9db7-b42ff6b275c4
+
+
+
+		    修改完之后mount -a 重新挂载是否报错
+		    mount 检查
+
+		    【继续编译安装数据库】
+		        cd /usr/local/mysql
+		        #方便管理,把mysql数据放入/data分区下的/data/data目录
+		    	mkdir -p /data/data
+		    	ll    /data
+		    	#改变属主,让mysql有写权限
+		    		chown -R mysql.mysql /data/data
+		    		chmod -R 770 /data/data
+
+		    	初始化数据库[rpm包的安装之后会自动初始化]
+		    		scripts/mysql_install_db --user=mysql --datadir=/data/data
+
+		    	安全性考虑 chown -R root /usr/local/mysql/*
+		    	加入开机启动豪华套餐
+			    	cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+			    	chkconfig --add mysqld
+			    	chkconfig --list mysqld
+
+			【mysql配置文件】集中式配置文件,可以为多个程序提供配置
+				/etc/my.cnf
+				[mysql]
+					fdaf
+				[mysqld]
+					fada
+				[CLENT]----对所有的客户端程序都生效比如myadmin
+				     cfa
+
+				加载配置文件，按顺序加载
+				 /etc/my.cnf --> /etc/mysql/my.cnf --> $BASEDIR/my.conf  -->（/.my.cnf） /BASEDIR.my.cnf
+				 	配置冲突,后一个会覆盖前一个
+				 	my-large.cnf
+				 	ls support-files/
+				 	head support-files/my-large.cnf
+				 		small 64M 
+				 		large 512M
+				 		huge 1G-2G
+				 	cp support-files/my-large.cnf /etc/my.cnf
+				 		[rpm包安装的mysql 的配置文件var/lib/mysql]
+				 	vi /etc/my.cnf
+				 		线程并发量
+				 		thread_concurrency = cpu 个数*2 
+				 		cat /proc/cpuinfo 查看CPU个数processor
+
+				 	[mysqld]
+				 		改变数据存储目录
+				 		datadir=/data/data
+
+				 	ls /usr/local/mysql/bin
+				 		2. /etc/profile.d/比/etc/profile好维护，不想要什么变量直接删除/etc/profile.d/下对应的shell脚本即可，不用像/etc/profile需要改动此文件
+
+				 		vi  /etc/profile.d/mysql.sh
+				 			export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/usr/local/mysql/bin
+
+
+				 		重新登录一次
+
+
+				 	[mysql维护了两类变量]
+				 		服务器变量：
+				 			定义MySQL服务器运行特行
+				 			SHOW GLOBAL VARIRBLES
+				 		状态变量：
+				 			保存了MySQL服务器运行统计数据
+				 			SHOW GLOBAL STATUS LIKE 'Datadir';
+				 			SHOW GLOBAL STATUS [LIKE 'STRING']
+				 			SHOW GLOBAL VARIABLES [LIKE '%data%']
+				 			SHOW GLOBAL STATUS;
+
+				 			SHOW GLOBAL VARIABLES;
+				 			317 rows in set (0.00 sec)
+
+				 			mysql> SHOW GLOBAL VARIABLES LIKE 'DATADIR';
+							+---------------+-------------+
+							| Variable_name | Value       |
+							+---------------+-------------+
+							| datadir       | /data/data/ |
+							+---------------+-------------+
+							1 row in set (0.00 sec)
+
+
+							mysql> SHOW GLOBAL VARIABLES LIKE 'SOCKET';
+							+---------------+-----------------+
+							| Variable_name | Value           |
+							+---------------+-----------------+
+							| socket        | /tmp/mysql.sock |
+							+---------------+-----------------+
+							1 row in set (0.00 sec)
+
+
+
+				 	MYSQL通配符：
+				 		_:任意单个字符;
+				 		%:任意长度的任意字符
+
+				 		ysql> SHOW GLOBAL VARIABLES LIKE '%data%';
+				 		export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/usr/local/mysql/bin
+
+				 		mysql> SELECT VERSION();
+						+------------+
+						| VERSION()  |
+						+------------+
+						| 5.5.59-log |
+						+------------+
+						1 row in set (0.00 sec)
+
+						USE mysql
+
+						mysql> SELECT DATABASE();
+						+------------+
+						| DATABASE() |
+						+------------+
+						| mysql      |
+						+------------+
+						1 row in set (0.00 sec)
+
+						mysql> SELECT USER();
+						+----------------+
+						| USER()         |
+						+----------------+
+						| root@localhost |
+						+----------------+
+						1 row in set (0.00 sec)
+
+						mysql> SHOW GLOBAL STATUS LIKE '%select%';
+						+------------------------+-------+
+						| Variable_name          | Value |
+						+------------------------+-------+
+						| Com_insert_select      | 0     |
+						| Com_replace_select     | 0     |
+						| Com_select             | 14    |
+						| Select_full_join       | 0     |
+						| Select_full_range_join | 0     |
+						| Select_range           | 0     |
+						| Select_range_check     | 0     |
+						| Select_scan            | 13    |
+						+------------------------+-------+
+						8 rows in set (0.00 sec)
+
+						vi /etc/man.configs
+						MANPATH /usr/local/mysql/man
+						库文件目录/usr/local/mysql/lib
+						vi /etc/ld.so.conf.d/mysql.conf
+							/usr/local/mysql/lib
+						ldconfig -v
+						输出库文件，缓存文件,
+						ls -l /etc/ld.so.cache
+						输出头文件
+						ln -sv /usr/local/mysql/include /usr/include/mysql
+						ls /usr/local/mysql/include
+
+	【编译安装php】
+		php53-mbstring 支持多字节语言 中文
+		 ./configure --help
+		 mkdir -p /usr/local/php
+
+		 ./configure --prefix=/usr/local/php --with-mysql=/usr/local/mysql --with-openssl --with-mysqli=/usr/local/mysql/bin/mysql_config --enable-mbstring --with-freetype-dir --with-jepg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --enable-sockets --with-apxs2=/usr/local/apache/bin/apxs --with-mcrypt --with-config-file-path=/etc --with-config-file-scan-dir=/etc/php.d --with-bz2 --enable-maintainer-zts
+
+		 报错：mcrypt.h not found. Please reinstall libmcrypt.
+		【yum install -y epel-release,yum install -y libmcrypt-devel这个包,两个不能一起安装,因为CentOs6默认的yum源没有 libmcrypt-devel这个包,只能借助epel的yum源,所以先安装epel,再安装libmcrypt】
+
+		 #编译成模块使用			
+		 ./configure --prefix=/usr/local/php 【指定安装目录】--with-mysql=/usr/local/mysql【告诉mysql在哪】 --with-openssl 【支持openssl】--with-mysqli=/usr/local/mysql/bin/mysql_config 【php另外一种和mysql交互程序】--enable-mbstring --with freetype-dir【支持自由字体库,引用不同字体】 --with-jepg-dir【支持图片】 --with-png-dir --with zlib【通用压缩裤,节约带宽】 --with-libxml-dir=/usr --enable-xml【扩展标记语言】 --enable-sockets 【支持基于套接字通信】 --with-apxs2=/usr/local/apache/bin/apxs 【基于钩子php编译成apache的模块】--with-mcrypt【用于加密】 --with-config-file-path=/etc【php配置主文件路径php.ini】 --with-config-file-scan-dir=/etc/php.d【php的配置文件片段】 --with-bz2 【压缩库】--enable-maintainer-zts 【MPM类型：prefork不用,event和worker就要】
+
+		 #编译成fast cgi使用		--with-apxs2=/usr/local/apache/bin/apxs 替换为	--enale-fpm
+		 ./configure --prefix=/usr/local/php 【指定安装目录】--with-mysql=/usr/local/mysql【告诉mysql在哪】 --with-openssl 【支持openssl】--with-mysqli=/usr/local/mysql/bin/mysql_config 【php另外一种和mysql交互程序】--enable-mbstring --with freetype-dir【支持自由字体库,引用不同字体】 --with-jepg-dir【支持图片】 --with-png-dir --with zlib【通用压缩裤,节约带宽】 --with-libxml-dir=/usr --enable-xml【扩展标记语言】 --enable-sockets 【支持基于套接字通信】 --enale-fpm 【fast cgi模式】--with-mcrypt【用于加密】 --with-config-file-path=/etc【php配置主文件路径php.ini】 --with-config-file-scan-dir=/etc/php.d【php的配置文件片段】 --with-bz2 【压缩库】--enable-maintainer-zts 【MPM类型：prefork不用,event和work就要】
+
+
+		 /usr/local/apache/bin/httpd -M
+		 	mpm_event_module (shared) 【默认是event】
+
+		 修改模式
+		 	/etc/http/conf.d
+
+		 xml扩展标记语言
+		 配置文件
+		 	/etc/php.ini  	   主配置文件
+		 	/etc/php.d/*.ini   副配置文件
+
+		 搜索rpmfind.net中搜素mash
+
+		 编译成模块不需要启动php服务,如果是fast cgi的话则需要启动服务
+
+
+
+
+
+
+
+
+
+
+
+
+

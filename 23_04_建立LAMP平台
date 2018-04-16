@@ -1,0 +1,201 @@
+23_04_建立LAMP平台
+
+【Linux centos6.5 2.6.32-431.el6.x86_64 #1 SMP Fri Nov 22 03:15:09 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux】
+实验环境基于 centos6.5
+
+	【练习】
+	----------------------------------------------------------------------
+	mysql>  SELECT * From student;
+	+--------------+------+--------+-----------------------+
+	| Name         | AGE  | Gender | Course                |
+	+--------------+------+--------+-----------------------+
+	| Ling Huchong |   24 | Male   | Hamogong              |
+	| Huang Rong   |   19 | Female | Chilian SHenzhang     |
+	| Lu WuShaung  |   18 | Female | Jiuyang Shengong      |
+	| Zhu Ziliu    |   52 | Male   | Pixie Jianfa          |
+	| Chen Jialuo  |   22 | Male   | Xianglong Shiba zhang |
+	+--------------+------+--------+-----------------------+
+	5 rows in set (0.00 sec)
+
+
+	----------------------------------------------------------------------
+	 CREATE DATABASE IF NOT EXISTS testdb;
+	 USE testdb;
+	 CREATE TABLE student(Name CHAR(20) NOT NULL,AGE TINYINT UNSIGNED,Gender CHAR(8) NOT NULL,Course  VARCHAR(100));
+	 INSERT INTO student VALUES('Ling Huchong',24,'Male','Hamogong');
+	 INSERT INTO student VALUES('Huang Rong',19,'Female','Chilian SHenzhang');
+	 INSERT INTO student VALUES('Lu WuShaung',18,'Female','Jiuyang Shengong');
+	 INSERT INTO student VALUES('Zhu Ziliu',52,'Male','Pixie Jianfa');
+	 INSERT INTO student VALUES('Chen Jialuo',22,'Male','Xianglong Shiba zhang');
+	 SELECT * From student;
+	 SELECT * FROM student WHERE  Gender='Male';
+	 SELECT * FROM student WHERE  AGE>20;
+	 UPDATE student SET Course='Kuihua Baodian' WHERE Name='Zhu Ziliu';
+	 SELECT * From student;
+	 ----------------------------------------------------------------------------
+	 mysql> SELECT * From student;
+	+--------------+------+--------+-----------------------+
+	| Name         | AGE  | Gender | Course                |
+	+--------------+------+--------+-----------------------+
+	| Ling Huchong |   24 | Male   | Hamogong              |
+	| Huang Rong   |   19 | Female | Chilian SHenzhang     |
+	| Lu WuShaung  |   18 | Female | Jiuyang Shengong      |
+	| Zhu Ziliu    |   52 | Male   | Kuihua Baodian        |
+	| Chen Jialuo  |   22 | Male   | Xianglong Shiba zhang |
+	+--------------+------+--------+-----------------------+
+	5 rows in set (0.00 sec)
+	----------------------------------------------------------------------------------
+
+	 CREATE USER 'testuser'@'%' IDENTIFIED BY 'testuser';
+	 CREATE USER 'test1'@'localhost' IDENTIFIED BY '123456';
+	 CREATE USER 'test1'@'127.0.0.1' IDENTIFIED BY '123456';
+	 GRANT ALL PRIVILEGES ON MYDB2 TO 'testuser'@'%';
+	 GRANT FOR testuser;
+
+	 【学习数据库】
+	 	SHOW DATABASES;
+	 	USE mysql;
+	  	DESC user;
+	  	SELECT User,Host,Password FROM user;
+
+	 【为用户设定密码】
+	 	1.SET PASSWORD FOR 'USERNAME'@'localhost'=PASSWORD('12345');
+
+	 	SET PASSWORD FOR 'username'@'host' = PASSWORD('newpassword')
+	 	SET PASSWORD FOR 'jerry'@'%'=PASSWORD('jerry');
+	 	 FLUSH PRIVILEGES;
+        
+        2.mysqladmin -uroot -hHOST -p password 'password'
+        	mysqladmin -uroot -h127.0.0.1 -p password '123456';
+
+        3.修改表的内容
+                                  函数   '你设置的密码'
+        UPDATE user SET Password=PASSWORD('password') WHERE USER='root' AND Host='127.0.0.1';
+        FLUSH PRIVILEGES;
+
+     	#授权一个用户所有权限,并拥有密码
+     	GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.16.%.%' IDENTIFIED BY 'redhat';
+
+        管理员不建议远程登录
+
+        【MYSQL客户端工具】
+
+        图形客户端工具
+        1.phpMyadmin
+        2.WorkbenchmySQL
+        3.MySQL Front
+        4.Natvicat for MySQL
+            授权
+        	GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'redhat';
+        	FLUSH PRIVILEGES;
+        5.Tod
+
+
+        【php和mysql的关系】
+        	php里面的代码
+        	php通过驱动连接mysql
+        	web.APP服务器----web应用程序---web服务器
+
+        单层apache服务器  php服务器 mysql服务器
+        双重apache + php
+        三层apache + php + mysql
+
+
+	  	[apache php mysql 三者联动]
+	  	查看所有用户
+
+	  	#查看数据库mysql里面的user表
+	  	SELECT User, Host, Password FROM mysql.user;
+
+
+	  	https://blog.csdn.net/qq_33054265/article/details/59790725
+	  	MySQL用户名和密码都正确却无法登陆的问题
+	  	----------------------------------------------------------
+	  	今天使用MySQL时，我创建了一个新用户： 
+		CREATE USER 'ubermensch'@'%' IDENTIFIED BY 'man2017'; 
+		然后登陆该用户时却一直报错（密码正确）： 
+		C:\Users\超人林>mysql -u ubermensch -p 
+		Enter password: ******* 
+		ERROR 1045 (28000): Access denied for user 'ubermensch'@'localhost' (using password: YES) 
+		后来翻阅网上资料发现MySQL中默认存在一个用户名为空的账户，只要在本地，可以不用输入账号密码即可登录到MySQL中。mysql在验证用户登陆的时候，首先是验证host列，如果host列在验证user列，再password列，而现在按照我之前的连接语句：按照host列找到为空的那列（空匹配所有用户名），所以匹配到了这条记录，然后发现这条记录的密码为空，而我的语句里面有密码，那么就会报错。 
+		解决办法：删除匿名用户。
+
+		mysql> use mysql;
+		Database changed
+		mysql> delete from user where user='';
+		Query OK, 1 row affected (0.00 sec)
+		mysql> flush privileges;
+		Query OK, 0 rows affected (0.00 sec)
+		mysql> exit;
+		1
+		2
+		3
+		4
+		5
+		6
+		7
+		然后就可以登陆用户了：
+
+		mysql -u ubermensch -p
+		Enter password: *******
+		Welcome to the MySQL monitor.
+	  	----------------------------------------------------------
+
+
+	  	【安装论坛】
+	  	discuz  赚钱的先付费
+	  	phpwind
+	    phpbb
+	    www.discuz.net
+
+	    【CMS】
+	     drupal
+	     joomla
+
+	    【LAMP】
+	    GRANT ALL PRIVILEGES ON *.* TO 'root'@'10.100.13.13' IDENTIFIED BY 'redhat';
+
+
+
+    1.httpd-2.4官方公布新特性(全)
+
+	      (1)MPM支持运行DSO机制；以模块形式按需加载；
+	      (2) 支持事件驱动，eventMPM模块生产环境可用；
+	      (3) 支持异步读写；
+	      (4) 支持每个模块及每个目录单独日志级别定义；
+	      (5) 每个请求相关的专业配置；<If>
+	      (6) 增强版的表达式分析器；
+	      (7) 支持毫秒级的持久连接时间限制定义(keepalivetimeout)；
+	      (8)基于FQDN的虚拟主机不再需要NameVirtualHost指令；
+	      (9) 支持新的指令，AllowOverrideList
+	      (10) 支持用户自定义变量；
+	      (11) 降低对内存的消耗
+
+	 新增模块：
+	 	mod_proxy_fcgi
+	 	mod_proxy_scgi
+	 	mod_proxy_express
+	 	mod_remoteip
+	 	mod_session
+	 	mod_ratelimit
+	 	mod_request
+
+	 等待：
+
+	 对于基于IP的访问控制：
+	 	不再支持order allow deny
+	 			allow from  all
+	 		 
+	 		 改为
+	 		 	Require [not] user USERNAME
+	 		 	Require group GRPNAME
+
+	 		 	Require ip IPADDR
+	 		 	172.16.0.0/255.255.0.0 = 172.16.0.0/16 
+
+	 		 	Require host HOSTNAME
+	 		 	www.magedu.com
+	 		 	.magedu.com
+
+	 		 	允许所有主机访问：
+	 		 	Require all deny

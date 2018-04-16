@@ -1,0 +1,293 @@
+nginx学习
+
+http://study.163.com/course/courseMain.htm?courseId=1005083015
+章节1课时1Nginx入门简介
+	高性能[静态页面 并发能力强]
+	反向代理服务
+
+	location block
+
+	对于apache优点
+		内核微小简洁 
+		并发响应好,并发5w级别
+		反向代理性能强（可用于负载均衡）
+		内存和CPU占用率低，40M一个进程
+		对后端服务有健康检查功能
+		支持php cgi和fast cgi方式 参数优化
+		配置简洁 容易上手
+
+章节1课时2Nginx工作原理及安装配置
+	模块
+		核心模块 http event mail
+		基础模块 http access； http fastcgi； http proxy ；http rewirte
+		第三方模块 http upstream request hash；notice； http access key
+
+	模型
+		apahce select模型 遍历所有句柄去找 遍历6楼找小明
+		nginx  epoll模型 事件响应,更快定位 去603找小明
+
+	nginx安装
+		pcre 库
+		yum install prce-devel -y
+		wget http://nginx.org/download/nginx-1.6.2.tar.gz
+		mkdir -p /usr/local/nginx
+		cd /usr/local/nginx-1.6.2
+		#隐藏版本号
+		vi /usr/local/nginx-1.6.2/src/core/nginx.h
+		--------------------------------------------
+		#define nginx_version      1006002
+		#define NGINX_VERSION      ""                     #改为空
+		#define NGINX_VER          "tfboy" NGINX_VERSION  #改为tfboy
+
+		#define NGINX_VAR          "tfboy"				  #改为tfboy
+		#define NGX_OLDPID_EXT     ".oldbin"
+		--------------------------------------------
+
+		/usr/sbin/groupadd -f www
+		/usr/sbin/useradd -g www www
+		cd /usr/local/nginx-1.6.2
+		yum install -y gcc
+		yum -y install zlib zlib-devel openssl openssl - devel pcre pcre-devel 
+		yum -y install openssl openssl-devel 
+		./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module
+		#with-http_stub_status_module 获取Nginx自上次启动以来的工作状态
+		#--with-http_ssl_module 支持ssl 模块
+		make
+		make install
+		#检查是否安装成功
+		/usr/local/nginx/sbin/nginx -t
+		# 启动nginx
+		/usr/local/nginx/sbin/nginx
+		ps -ef |grep nginx
+		网页访问：http://10.100.13.139/
+		查看版本http://10.100.13.139/sadasd
+
+章节1课时3Nginx常用命令管理及升级	
+	【常用命令】
+		ps -ef |grep nginx
+		hill
+		/usr/local/nginx/sbin/nginx -t
+		平滑重启
+		/usr/local/nginx/sbin/nginx -s reload
+		主配置文件
+		/usr/local/nginx/conf
+			nginx.conf
+		默认网页
+		/usr/local/nginx/html
+		关闭nginx
+		pkill nginx
+		/usr/local/nginx/sbin/nginx -s stop
+		#查看nginx版本
+		/usr/local/nginx/sbin/nginx -v
+		/usr/local/nginx/sbin/nginx -V
+		-------------------------------
+		[root@localhost nginx-1.6.2]# /usr/local/nginx/sbin/nginx -V
+		nginx version: nginx/1.6.2
+		built by gcc 4.4.7 20120313 (Red Hat 4.4.7-18) (GCC) 
+		TLS SNI support enabled
+		configure arguments: --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module
+		[root@localhost nginx-1.6.2]# 
+		-------------------------------
+		#编译升级，不改变原来配置
+			1.下载源码包1.4.2
+			2./usr/local/nginx/sbin/nginx -V 获取原来的参数
+			3.按照原来参数编译
+			4.make 不可以执行make install
+			5.备份旧的 mv /usr/local/nginx/sbin/nginx /usr/local/nginx/sbin/nginx.old
+			6.cp /usr/local/nginx-1.4.2/objs/nginx /usr/local/nginx/sbin/nginx
+			7.查看版本/usr/local/nginx/sbin/nginx -V
+			8.平滑重启nginx cat /usr/local/nginx/log/nginx.pid
+			9.kill -USR2 pid号
+			10.kill -WINCH pid号
+			11./usr/local/nginx/sbin/nginx -s reload
+
+章节2课时4Nginx配置文件精讲一
+	nginx 定义用户组
+		user www www
+	启动进程 通常设置为和cpu的数量相等
+		worker_processes
+
+	虚拟主机
+	http 日志 /var/log/httpd/access_log
+
+http://study.163.com/course/courseLearn.htm?courseId=1004502026#/learn/video?lessonId=1048955411&courseId=1004502026
+章节1课时2nginx（编译安装）（改）
+数据从硬盘读取到内核，再从内核到用户进程空间
+	【IO模型】
+		同步阻塞--阻塞就是一直等待的意思
+			1.订餐（请求数据）
+			2.一直站着傻等（数据从硬盘拷贝到内核，再从内核空间拷贝到用户空间）
+			3.餐准备完成（数据到用户的内存空间）
+			4.取餐
+		同步非阻塞
+			1.订餐（请求数据）
+			2.询问（数据从硬盘拷贝到内核，一直询问数据从硬盘到内核好了没有）
+			3.餐准备完成（数据到用户的内存空间）
+			4.取餐
+		IO复用
+			select()
+			poll()
+		event 时间驱动 
+			1.响应,已接受订单
+			2.你去干别的事情,看手机
+			3.响铃通知,你的晚餐正在准备（数据准备从内核拷贝到用户空间前）
+			4.你去取餐
+		异步模式
+		    1.内核消息:已接受请求
+		    2.内核读取数据,数据从内核拷贝到用户空间完成后
+		    3.通知用户取餐
+		    4.用户过来取餐
+
+	【并发编程,处理并发用户请求】
+		单进程模型:串行方式响应
+		多进程模型:prefork，一个进程响应一个用户请求,并发使用多个进程实现（预先生成多个进程）
+		多线程模型：worker，一个进程生成多个线程,一个线程响应一个用户请求,并发使用多个线程实现:n进程 n*m个线程（3*25）
+		事件模型：event，一个线程响应多个用户请求,基于事件驱动机制来维护多个用户请求 
+
+	【nginx特性】
+
+	基本功能：
+		静态资源的web服务器，能缓存打开的文件描逃符
+		反向代理服务器，缓存，负载均衡
+		能支持fastcGl协议，可以和fpm结合起来实现LNMP d]
+		模块化：非DSO机制，过滤器gzip,SSI和图像大小调整
+		支持SSL
+	扩展功能：
+		基于名称和ip虚拟主机端口
+		支持keepalive
+		支持平滑升级，更新，重启
+		定制访问日志，支持使用日志缓存以提高性能
+		支持url rewrite
+		支持路径别名
+		支持基于ip及用户的认证：htppasswd
+		支持速率限制，并发数限制等
+		支持acl控制
+
+	【nginx系统架构】
+			master进程+多个worker进程
+		事件驱动io模型
+		消息通知：select poll
+		sedfile机制：提高响应速度
+
+		不用sendfile的传统网络传输过程
+			硬盘>>kernel buffer>>user buffer>>kernel socket buffer>>协议栈
+		使用sendfile的传统网络传输过程
+			硬盘盘>>kernel buffer《快速拷贝到kernel socket buffer)>>协议栈
+		
+		 tcp_nopush = on 会设置调用tcp-cork方法，默认开启，数据包不会马上传送出去，数据包最大时，一次性的传输出去，这样有助于解决网络堵塞。
+		nginx:非阻塞模型事件驱动
+		
+		nginx的模块类别：
+			标准httpd模块
+			可选的http模块
+			最E语协
+			第三方扩展模块
+http://study.163.com/course/courseLearn.htm?courseId=1004502026#/learn/video?lessonId=1048955411&courseId=1004502026
+    【nginx安装】
+    	nginx-1.10.1.tar.gz
+    	nginx-1.11.5.tar.gz
+
+    	1.安装依赖库
+    	2.设定账户
+    		useradd -s /sbin/nologin nginx
+    	3.源代码都放在/usr/local/src
+    	4.编译安装
+    	5.启动nginx 【elinks --dump 127.0.0.1】
+    	6.查看参数/usr/local/nginx -h
+    		/usr/local/nginx -V 查看详细信息  
+    	    /usr/local/nginx -t 查看配置是否正确
+    	    /usr/local/nginx/sbin/nginx -c /etc/nginx.conf 配置文件移动时，-c 用来指定配置文件
+
+章节2课时3nginx（信号）
+	【nginx】
+	 	http 1主 + 8 辅
+	 	apache 
+	 		为什么主进程是管理员 能开启1-1024端口
+	 		master进程（主进程） 响应80端口，分配任务
+	 		worker进程（子进程）对用户请求进行处理
+
+	【信号】给进程发信号
+		/usr/local/nginx/sbin/nginx -s
+			stop
+			start
+			reload 重新读取配置文件
+
+		查看进程编号
+			ps -ef | grep nginx
+			cat /usr/local/nginx/logs/nginx.pid
+		kill + 参数
+			TERM 快速关闭 强制关机 同时杀主进程子进程
+				kill -TERM `cat /usr/local/nginx/logs/nginx.pid`
+			QUIT 从容关闭 普通关机 等子进程处理完后,关闭
+			    kill -QUIT `cat /usr/local/nginx/logs/nginx.pid`
+			WINCH 从容关闭子进程，主进程还在
+				kill -WINCH `cat /usr/local/nginx/logs/nginx.pid`
+				HUP 重新读取配置文件生成子进程
+				kill -HUP `cat /usr/local/nginx/logs/nginx.pid`
+			USR1 重新打开日志文件，把日志剪切走，用此命令重新生成日志文件
+				cd /usr/local/nginx/logs/
+				rm -rf access.log error.log
+				ls
+				kill -USR1 `cat /usr/local/nginx/logs/nginx.pid`
+
+			USER2 平滑升级可执行程序
+
+http://study.163.com/course/courseLearn.htm?courseId=1004502026#/learn/video?lessonId=1048954402&courseId=1004502026
+章节2课时4nginx（平滑升级和回退）
+
+client body_temp 临时文件存放路径（只有当上传的请求超出缓存区大小时，才会使用临时文
+SLNM 件目录）
+proxy temp 反向代理的数据在硬盘的存储目录
+fastcgitemp fastcgi的级存目录（与php结合时使用）
+scgi_temp fastcgi的精简版
+uwsgi_temp与python结合时使用
+
+
+Nginx平滑重启
+kill -HUP nginx主进程号
+当nginx接收到HUP信号时，它会尝试先解析配置文件（如果指定配置文件，就使用指定的，否则就是
+用默认的），如果成功，就应用新的配置文件（例如，重新打开日志文件或者监听的套接字）.之后nginx
+运行新的工作进程并从容关闭旧的工作进程，所有客户端的服务完成后，旧的工作进程被关闭，如果
+新的配置文件应用失败，nginx将继续使用旧的配置进行工作
+Nignx的平滑升级
+当需要将正在运行中的nginx升级，添加/删除服务模块时，可以在不申新服务的情况下，使用新版本，
+，重编译摩州实高哥教料量修馨换晶骼奇我器检厚，对学编译要装的Ngi加x.可以将新版本编译安装到
+日断太故上站感由表城一各记家心一口的新批产理。
+汉本的nginx安级路径甲，香换之
+Kill-USR2日版本的nginx主进程号
+·旧版本的主进程将重命名它的pid文件为.oldbin（例如：/usr/local/nginx/logs/
+
+-----------------------------------------
+[root@localhost nginx]# ls
+client_body_temp  conf  fastcgi_temp  html  logs  proxy_temp  sbin  scgi_temp  uwsgi_temp
+[root@localhost nginx]# pwd
+/usr/local/nginx
+[root@localhost nginx]# 
+------------------------------------------
+		
+		配置文件/usr/local/nginx/conf/nginx.conf
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
