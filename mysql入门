@@ -1,0 +1,235 @@
+ mysql入门
+ 	https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830042615432688&vid=x1421r4r7ou
+
+ 【MySQL数据库的基础认识以及地位】
+ 	mysql
+ 		data/* 表示表的内容
+ 		lib    扩展库
+ 		share  系统需要的东西,字符编码
+ 		bin    系统命令
+ 		my.ini 数据库的配置文件
+
+  【MySQL sql语句的分类以及简单介绍】
+  	 注释关键字
+  	 	# 
+  		--空格 
+  		/* */      多行注释
+
+  【MySQL数据类型数值以及浮点型介绍】
+  		数值类型
+  			整数型
+  				tinyint   1个字节 0-255  【-2的7次方到2的15次方减1】
+  				smallint  2个字节 0-65535 
+  				mediumint 3个字节 
+  				int       4个字节
+  				bigint	  8个字节
+
+  		浮点型
+  			float(m,d)     单精度是这样的格式，1位符号，8位指数，23位小数。
+  				非精确数，通常不设定长度
+  			Double(m,d)    双精度是1位符号，11位指数，52位小数。
+   				非精确数，通常不设定长度
+  			decimal(m,d)  
+  				decimal(4,2) 12.14  总数位数为4，小数位数2
+
+
+  		字符串类型
+  			CHAR              0-255字节      字符串长度，存取查询速度比VARCHAR快，但是浪费空间
+  				CHAR(5)       定长5个字符   【不够空格补，多了截掉】节省空间
+  				CHAR(10)      12345678空空
+   			VARCHAR		      可变长度根据字符长度自动调节 0-65535
+   				VARCHAR(10)   12345678
+
+   			TXT                一般用这个够存了，文字内容
+  			TINYTEXT
+  			MEDIUMTEXT
+  			LONGTEXT
+  			ENUM 枚举
+  			SET 
+
+  		时间日期类型
+  			DATA           YYYY-MM-DD 年月日
+  			TIME           HH:MM:SS    时分秒
+  			YEAR           YYYY        年
+  			DATETIME       YYYY-MM-DD HH:MM:SS
+  			TIMESTAMP      YYYYMMDD HHMMSS     			应用广泛
+  				数据库存储的是时间搓 用int存 1503889157 便于计算
+
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830076975171056&vid=u1421bvhzrb
+【字段修饰类型】
+	列名的修饰
+		unsigned       (无符号)
+		auto_increment (自动增加)
+		default 	   (默认值)
+		comment  	   (字段解释说明)
+
+		not null null  (非空) 所有字段都不能为空
+
+		unique (唯一索引)
+		index  (普通索引)
+
+		primary key(主键)  id 1 2 3 4 5 6
+		auto_increment 	  必须制定为primary key  自动增长id 1 2 3 4 5 6 插入一个增长1
+
+【MySQL sql语句之运算符介绍】
+
+	= 赋值和判断
+
+	!= ,<>          不等于
+	< > ,<=  >= 
+	OR              或者
+	AND             条件都成立
+	BETWEEN ...AND  between 5 and 50
+	IN              in(1,2,3,4)
+	NOT IN          not in
+
+
+【MySQLsql语句的分类】
+	DDL 数据库定义语言 -data defination
+		创建 删除 修改表结构
+	DML 数据造作语言-data manipulation
+		增删改表的记录
+	DCL 数据控制语言-data control
+		用户的创建以及授权
+	DQL 数据查询云烟-data query
+		查询数据
+
+	DDL
+		SHOW DATABASE;
+		USE  + 数据库名字;
+		CREATE DATABASE + 数据库名字;
+		DROP DATABASE + 数据库名字;
+
+	DML 
+	username   emial   age   fee   data
+
+mysql> CREATE TABLE USER(
+    id字段 整型 无符号 不为空     自动递增      注释    ,待续
+    -> id int unsigned not null auto_increment comment '用户ID',
+
+mysql> CREATE TABLE USER(
+    -> id int unsigned not null auto_increment comment '用户ID',
+    -> user_name varchar(20) not null comment '用户名',
+    -> email varchar(50) not null comment '用户邮箱',
+    -> age tinyint unsigned not null comment '用户年龄',
+    -> fee decimal(10,2) not null default 0.00 comment '用户余额',
+    -> created_at timestamp not null comment '注册时间',
+    -> primary key(id)
+
+CREATE TABLE USER(
+id int unsigned not null auto_increment comment '用户ID',
+user_name varchar(20) not null comment '用户名',
+email varchar(50) not null comment '用户邮箱',
+age tinyint unsigned not null comment '用户年龄',
+fee decimal(10,2) not null default 0.00 comment '用户余额',
+created_at timestamp not null comment '注册时间',
+primary key(id)
+);
+
+--------------------------------------------------------------------------------------------------
+mysql> DESC USER;
++------------+---------------------+------+-----+-------------------+-----------------------------+
+| Field      | Type                | Null | Key | Default           | Extra                       |
++------------+---------------------+------+-----+-------------------+-----------------------------+
+| id         | int(10) unsigned    | NO   | PRI | NULL              | auto_increment              |
+| user_name  | varchar(20)         | NO   |     | NULL              |                             |
+| email      | varchar(50)         | NO   |     | NULL              |                             |
+| age        | tinyint(3) unsigned | NO   |     | NULL              |                             |
+| fee        | decimal(10,2)       | NO   |     | 0.00              |                             |
+| created_at | timestamp           | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++------------+---------------------+------+-----+-------------------+-----------------------------+
+6 rows in set (0.00 sec)
+
+mysql> SHOW CREATE TABLE USER;
++-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table | Create Table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
++-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| USER  | CREATE TABLE `USER` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `user_name` varchar(20) NOT NULL COMMENT '用户名',
+  `email` varchar(50) NOT NULL COMMENT '用户邮箱',
+  `age` tinyint(3) unsigned NOT NULL COMMENT '用户年龄',
+  `fee` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '用户余额',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '注册时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8                      |
++-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> 
+
+---------------------------------------------------------------------------------------------------
+DDL
+
+【修改表字段】
+ 	修改表USER 里面的 username_name 字段为varchar(50) not null
+	ALTER TABLE USER MODIFY user_name varchar(50);
+	ALTER TABLE USER MODIFY user_name  varchar(50) not null;
+
+ 	修改表USER 里面的 email 字段为 user_email varchar(50) not null
+	alter table USER change email user_email varchar(50) not null;
+
+	添加字段
+	alter table USER add password char(32) not null comment '用户密码';
+
+	添加字段
+	alter table USER add password char(32) not null comment '用户密码' after name;
+	alter table USER add moblie char(11) not null comment '手机号码';
+
+
+mysql> DESC USER;
++------------+---------------------+------+-----+-------------------+-----------------------------+
+| Field      | Type                | Null | Key | Default           | Extra                       |
++------------+---------------------+------+-----+-------------------+-----------------------------+
+| id         | int(10) unsigned    | NO   | PRI | NULL              | auto_increment              |
+| user_name  | varchar(50)         | NO   |     | NULL              |                             |
+| user_email | varchar(50)         | NO   |     | NULL              |                             |
+| age        | tinyint(3) unsigned | NO   |     | NULL              |                             |
+| fee        | decimal(10,2)       | NO   |     | 0.00              |                             |
+| created_at | timestamp           | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
+| password   | char(32)            | NO   |     | NULL              |                             |
+| mobile     | char(11)            | NO   |     | NULL              |                             |
++------------+---------------------+------+-----+-------------------+-----------------------------+
+8 rows in set (0.00 sec)
+
+mysql> 
+
+
+【修改表名】
+	alter tables user rename users;
+
+mysql> DESC users;
++------------+---------------------+------+-----+-------------------+-----------------------------+
+| Field      | Type                | Null | Key | Default           | Extra                       |
++------------+---------------------+------+-----+-------------------+-----------------------------+
+| id         | int(10) unsigned    | NO   | PRI | NULL              | auto_increment              |
+| user_name  | varchar(50)         | NO   |     | NULL              |                             |
+| user_email | varchar(50)         | NO   |     | NULL              |                             |
+| age        | tinyint(3) unsigned | NO   |     | NULL              |                             |
+| fee        | decimal(10,2)       | NO   |     | 0.00              |                             |
+| created_at | timestamp           | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
+| password   | char(100)           | NO   |     | NULL              |                             |
+| mobile     | char(11)            | NO   |     | NULL              |                             |
++------------+---------------------+------+-----+-------------------+-----------------------------+
+8 rows in set (0.00 sec)
+
+
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830102744974832&vid=o14210cj7s0
+
+DML
+【MySQL之DML插入数据库的几种方法】
+ 	insert into USER (user_name,user_email,age,fee,created_at,password,mobile) values ('Jack','jack@youkeshu.com',18,99.99,'2017-08-30 11:34:25',password('123'),'12345678901');
+
+select * from users;
+
+mysql> select * from users;
++----+-----------+-------------------+-----+-------+---------------------+-------------------------------------------+-------------+
+| id | user_name | user_email        | age | fee   | created_at          | password                                  | mobile      |
++----+-----------+-------------------+-----+-------+---------------------+-------------------------------------------+-------------+
+|  1 | Jack      | jack@youkeshu.com |  18 | 99.99 | 2017-08-30 11:34:25 | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 | 12345678901 |
++----+-----------+-------------------+-----+-------+---------------------+-------------------------------------------+-------------+
+1 row in set (0.00 sec)
+
+
+insert into users (user_name,user_email,age,password,mobile) values ('liudehua','liudehua@youkeshu.com',18,'123','12312312312');
+insert into users values (3,'liming','liming@youkeshu.com','28','983','2015-08-30 11:34:25','1234123','93847382911');

@@ -167,7 +167,7 @@
 			 	#dd 删除整行
 			 	#yy 复制整行 p 粘贴
 			 	#u 撤销 ctrl + r 恢复
-			    ServerAdmin www.a.org
+			    ServerName www.a.org
 			    DocumentRoot "/www/a.org"
 			    ErrorLog "/var/log/httpd/a.org-error_log"
 			    CustomLog "/var/log/httpd/a.org-access_log" combined
@@ -179,7 +179,7 @@
 				</Directory>
 			</VirtualHost>
 			<VirtualHost *:80>
-			    ServerAdmin www.b.net
+			    ServerName www.b.net
 			    DocumentRoot "/www/b.net"
 			    ErrorLog "/var/log/httpd/b.net-error_log"
 			    CustomLog "/var/log/httpd/b.net-access_log" common
@@ -244,6 +244,7 @@
 			mpm_event_module (shared)
 
 		dd if=/dev/zero of=/www/a.org/test2.html bs=1M count=2
+【phpMyAdmin-3.5.1安装】		
 		phpMyAdmin-3.5.1-all-languages.tar.bz2 https://www.phpmyadmin.net/files/3.5.1/
 		tar -xvf /usr/local/phpMyAdmin-3.5.1-all-languages.tar.bz2 -C /www/b.net
 		cd /www/b.net/

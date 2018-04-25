@@ -1,0 +1,53 @@
+01_开课介绍及vmware的使用入门(01)_recv
+	
+	介绍课程：
+		中级：系统管理、服务安全及服务管理、shell脚本
+		初级：系统基础
+
+	高级:
+		MySQL数据库
+
+		集群：Cluster
+
+		lb：
+			4layer
+			7layer
+
+		ha：
+
+	分布式
+		zookeeper
+		分布式文件系统
+
+	虚拟化技术：
+		xen
+		kvm
+
+	Openstack：IAAS云：
+
+	运维工具：
+		ansible
+		puppet(ruby),soltstack(python)
+
+	监控工具：
+		zabbix
+
+	大数据处理:
+	 	hadoop
+	 	spark,store
+
+	 	elk:elasticsearch,logstash,kibana
+
+
+	docker:
+
+	Python:
+
+	认证：
+	   RHCSA
+	   RHCE
+	   RHCA
+
+01_OS及Linux基础知识(02)_recv.mkv
+	CPU:运算器、控制器
+	

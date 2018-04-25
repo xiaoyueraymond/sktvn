@@ -4,3 +4,10 @@
 	/swap   512M
 	/根分区 40G
 	/data 分区
+
+遍历目录bat
+@echo off 
+for /R "F:\BaiduNetdiskDownload\马哥Linux运维共208讲\02运维中级" %%s in (*) do ( 
+echo %%s >>"1.txt"
+) 
+pause 	

@@ -1,1 +1,277 @@
 24_04_编译安装LAMP之配置httpd以FastCGI方式与php整合
+
+http
+	fastcgi模块 版本2.4后提供fcgi
+	--enables-modules=most 编译大多数模块
+php
+	cgi
+	module
+	fastcigi(fpm)
+
+重新安装LAMP 
+
+【apche像原来一样安装】
+	./configure --prefix=/usr/local/apache --sysconfdir=/etc/httpd --enable-so --enable--rewirte --enable-ssl --enable-ssl --enable-cgi  --enable-cgid  --enable-modules=most 【编译多数的模块】  -enable-mods-share=most  --enable-mpms-shared=all --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util
+
+【apche环境变量】
+	# 编辑PATH搜索路径2
+		vi /etc/profile.d/httpd.sh
+		export PATH=$PATH:/usr/local/apache/bin
+
+【mysql5.6.10安装】
+	 yum install -y weget
+	 wget http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.10.tar.gz/from/http://cdn.mysql.com/
+	 mv index.html mysql-5.6.10.tar.gz 
+	 tar zxvf  mysql-5.6.10.tar.gz  -C /usr/local
+
+【安装编译源码所需的工具和库】
+	yum -y install wget gcc-c++ ncurses-devel cmake make perl
+
+
+【然后创建mysql的用户组和用户，并且不允许登录权限：】
+	groupadd mysql
+	useradd -g mysql -s /sbin/nologin mysql
+	id mysql
+
+
+【挂载硬盘；划分逻辑分区】
+ 	mkfs.ext4 /dev/sdb
+ 	fdisk /dev/sdb 	
+ 	yum -y install parted
+ 	partprobe
+ 	pvcreate /dev/sdb1
+ 	pvdisplay
+ 	511
+ 	vgcreate myvg /dev/sdb1
+ 	#lv不能跨vg，创建了在哪个vg就在哪个vg
+ 	lvcreate -l 511 -n mylv myvg
+ 	mke2fs -t ex4 -b 1024  /dev/myvg/mylv
+ 	lvextend -l 511 /dev/mapper/myvg-mylv 
+ 	resize2fs /dev/myvg/mylv
+ 	mkdir /data
+ 	mount /dev/myvg/mylv /data/
+ 	dumpe2fs -h /dev/myvg/mylv
+ 		178da179-f7d2-4968-9f9f-5a25959cdff7
+ 	vi /etc/fstab
+ 		UUID=178da179-f7d2-4968-9f9f-5a25959cdff7 /data      ext4    defaults        0 0
+ 	mount -a
+	resize2fs命令被用来增大或者收缩未加载的“ext2/ext3”文件系统的大小。如果文件系统是处于mount状态下，那么它只能做到扩容，前提条件是内核支持在线resize。，linux kernel 2.6支持在mount状态下扩容但仅限于ext3文件系统。
+
+
+【给MySQL的安装准备目录：】
+	mkdir -p /data/data
+	chown -R mysql:mysql /data/data
+	chmod -R 777 /data/data
+
+【创建链接】
+	ln -sv /usr/local/mysql-5.6.10 /usr/local/mysql
+	chown -R mysql:mysql /usr/local/mysql/
+
+【初始化】
+	cd /usr/local/mysql/
+------------------------------------------------------
+	cmake \
+	-DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+	-DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
+	-DDEFAULT_CHARSET=utf8 \
+	-DDEFAULT_COLLATION=utf8_general_ci \
+	-DWITH_MYISAM_STORAGE_ENGINE=1 \
+	-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+	-DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+	-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+	-DWITH_MEMORY_STORAGE_ENGINE=1 \
+	-DWITH_READLINE=1 \
+	-DENABLED_LOCAL_INFILE=1 \
+	-DMYSQL_DATADIR=/data/data \
+	-DMYSQL_USER=mysql \
+	-DMYSQL_TCP_PORT=3306
+
+	make
+	make install
+-----------------------------------------------------------
+    cd /usr/local/mysql/
+	chmod -R 770 /usr/local/mysql/scripts/
+	scripts/mysql_install_db --user=mysql --datadir=/data/data
+
+
+【配置文件】
+    ll /usr/local/mysql/
+	-rw-r--r--  1 root  root     943 Apr 17 19:13 my.cnf
+	chown -R mysql:mysql /usr/local/mysql/
+	编辑配置文件
+		cp /usr/local/mysql/support-files/my-default.cnf /etc/my.cnf
+		vi /etc/my.conf/
+			# datadir = ..... → datadir = /data/data
+
+【启动脚本】
+	cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+    	chkconfig --add mysqld
+    	chkconfig --list mysqld		
+
+
+
+【添加环境变量】
+	# 编辑PATH搜索路径1
+	　　vi /etc/profile
+	　　Append these 2 lines to the end of the file:
+	　　PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH
+	　　export PATH
+	# 编辑PATH搜索路径2
+		vi /etc/profile.d/mysql.sh
+		export PATH=$PATH:/usr/local/mysql/bin
+
+---------------------------------------------------------------------
+
+
+【安装php-5.4.13】
+	 http://museum.php.net/php5/php-5.4.13.tar.gz	
+	 yum install -y epel-release,yum install -y libmcrypt-devel
+	 tar zxvf php-5.4.13.tar.gz
+	 cd /usr/local/php-5.4.13
+
+
+【编译php】
+	ln -sv /usr/local/php-5.4.13 /usr/local/php
+
+		 ./configure --prefix=/usr/local/php --with-mysql=/usr/local/mysql --with-openssl --with-mysqli=/usr/local/mysql/bin/mysql_config --enable-mbstring --with-freetype-dir --with-jepg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --enable-sockets --enable-fpm --with-mcrypt --with-config-file-path=/etc --with-config-file-scan-dir=/etc/php.d --with-bz2 
+
+	#executing default commands
+	make
+	make install
+
+【为php提供配置文件】
+	cp /usr/local/php/php.ini-production /etc/php.ini
+
+【配置fpm】
+	[1]为php-fpm提供Syav init脚本,并将其添加至服务器列表：
+		cp /usr/local/php/sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm
+		chmod +x /etc/rc.d/init.d/php-fpm
+		chkconfig --add php-fpm
+		chkconfig --list php-fpm
+		chkconfig php-fpm on
+
+	[2]为php-fpm提供配置文件
+		cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+
+	[3]编辑php-fpm配置文件：配置fpm的相关选项为你所需要的值,并启用pid文件(如下最后一行)：
+		vi /usr/local/php/etc/php-fpm.conf
+			pm.max_children = 5 → pm.max_children = 50             #最多有多少个子进程
+			pm.start_servers = 2  → pm.start_servers = 5           #启动时有多少个进程
+			pm.min_spare_servers = 5 → pm.min_spare_servers = 2    #最少有几个空闲进程
+			pm.max_spare_servers = 8 → pm.max_spare_servers = 8	   #最多有几个空闲进程
+			pid = /usr/local/php/var/run/php-fpm.pid
+	 启动fpm
+	 	service php-fpm start
+
+反向代理 
+	用户请求  -->  apache服务器  -->    php服务器
+	用户请求  <--  apache服务器  <--    php服务器   
+
+【注释中心主机】
+	1.禁用中心主机
+		mkdir /www/{a.org,a.org} -pv	
+		mkdir /var/log/httpd
+
+		vi /etc/httpd/httpd.conf 默认日志路径/usr/local/apache/logs/
+			DocumentRoot "/usr/local/apache/htdocs"   →  #DocumentRoot "/usr/local/apache/htdocs"
+			#Include /etc/httpd/extra/httpd-vhosts.conf → Include /etc/httpd/extra/httpd-vhosts.conf
+	#httpd2.4 以后已经专门有一个模块针对fastcgi的实现，此模块为mod_proxy_fcgi.so,是对mod_proxy.so模块的扩充。			
+			#LoadModule proxy_module modules/mod_proxy.so → LoadModule proxy_module modules/mod_proxy.so
+			#LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so → LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so
+ 			AddType application/x-httpd-php  .php
+ 			AddType application/x-httpd-php-source  .phps
+ 			AddDefaultCharset gb2312
+			AddDefaultCharset UTF-8
+			<IfModule dir_module>
+			   DirectoryIndex index.php index.html	
+			</IfModule>
+
+		vi 	/etc/httpd/extra/httpd-vhosts.conf	
+
+			<VirtualHost *:80>
+			    ServerName www.a.org
+			    DocumentRoot "/www/a.org"
+			    ProxyRequests off
+			    ProxyPassMatch ^/(.*\.php)$ fcgi://127.0.0.1:9000/www/a.org/$1
+				<Directory "/www/a.org">
+					Options none
+					AllowOverride none
+					Require all granted 
+				</Directory>
+			    ErrorLog "/var/log/httpd/a.org-error_log"
+			    CustomLog "/var/log/httpd/a.org-access_log" combined
+			</VirtualHost>				
+
+【注释中心主机】
+	语法检查 httpd -t
+
+【建设网页】	
+	vi /www/a.org/index.html
+		<html>
+		<body>
+		<h1>
+		        this is the /www/a.org/index.html
+
+		        :∴★∵* * ☆．∴★∵*★·'☆°·'☆°
+		∴█████．☆．∵★∵∴☆·'☆°
+		☆█田█田█．* ☆．∴°··°．·'°∴★∵
+		∵█田█田█．★∵∴☆．★∵∴·'☆°
+		 
+		╭∞━━━╮.oо◎
+		┃ ┃
+		┃● ●┃
+		┃﹋ ε ﹋ ┃
+		○━━━━╯
+
+		</h1>
+		</body>
+		</html>
+
+		 <?php
+		  echo "<title>Test Page</title>"
+		  phpinfo()
+		  ?>
+
+【安装xcache】
+	1、下载最新版本Xcache源码包(xcache-3.0.1)并解压。
+		cd /usr/local/
+		wget http://xcache.lighttpd.net/pub/Releases/3.0.1/xcache-3.0.1.tar.gz
+		tar -zxvf xcache-3.0.1.tar.gz
+
+
+	2、Xcache模块编译动态安装。
+		rm xcache-3.0.1.tar.gz -rf
+		cd xcache-3.0.1
+		/usr/local/php/bin/phpize
+		./configure --with-php-config=/usr/local/php/bin/php-config --enable-xcache
+		make && make install
+			Installing shared extensions:     /usr/local/php/lib/php/extensions/no-debug-non-zts-20100525/
+		mkdir -p /etc/php.d
+		cp /usr/local/xcache-3.0.1/xcache.ini /etc/php.d/
+
+【phpMyAdmin-3.5.1安装】		
+		phpMyAdmin-3.5.1-all-languages.tar.bz2 https://www.phpmyadmin.net/files/3.5.1/
+		tar -xvf /usr/local/phpMyAdmin-3.5.1-all-languages.tar.bz2 -C /www/a.org
+		cd /www/a.org/
+		mv phpMyAdmin-3.5.1-all-languages/ pma/
+		生成密码
+			openssl rand -hex 11
+				1465480dcb490d6144da95
+			openssl rand -base64 10
+
+		配置文件config.sample.inc.php
+			 cp /www/a.org/pma/config.sample.inc.php /www/a.org/pma/config.sample.php 
+			 vi /www/a.org/pma/config.sample.php
+			 	$cfg['blowfish_secret'] = '1465480dcb490d6144da95'; /* YOU MUST FILL IN THIS FOR COOKIE AUTH! */
+→ 
+		配置apche vi /etc/httpd/httpd.conf
+		   	 添加：ServerName  localhost:80
+
+		mysqladmin -uroot password '123'
+		mysqladmin -uroot -p flush-privileges
+    	GRANT ALL PRIVILEGES ON *.* TO 'jack'@'localhost' IDENTIFIED BY '123';
+    	FLUSH PRIVILEGES;
+		mysql -u jack -p
+
+		MySQL服务器启动错误 'The server quit without updating PID file'
+		https://pein0119.github.io/2015/03/25/MySQL%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%90%AF%E5%8A%A8%E9%94%99%E8%AF%AF-The-server-quit-without-updating-PID-file/

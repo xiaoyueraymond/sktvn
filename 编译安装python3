@@ -1,0 +1,65 @@
+编译安装python3
+https://blog.csdn.net/the_lone_wolfs/article/details/79065699
+1. 安装依赖环境
+# yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel
+1
+2. 下载Python3
+https://www.python.org/downloads/
+
+# wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
+
+# wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
+
+3. tar -zxvf Python-3.6.1.tgz
+4. 进入解压后的目录，编译安装。
+# cd Python-3.6.1
+# ./configure --prefix=/usr/local/python3
+
+# make && make altinstall 
+
+5. 建立python3的软链
+# ln -s /usr/local/python3/bin/python3.6 /usr/bin/python3
+1
+6. 并将/usr/local/python3/bin加入PATH
+(有些服务器不需要加入 可能已经加入可 Python3 看看)
+
+# vim ~/.bash_profile
+# .bash_profile
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+. ~/.bashrc
+fi
+# User specific environment and startup programs
+PATH=$PATH:$HOME/bin:/usr/local/python3/bin
+export PATH
+
+按ESC，输入:wq回车退出。
+
+7. 修改完记得执行行下面的命令，让上一步的修改生效：
+# source ~/.bash_profile
+1
+8. 检查Python3及pip3是否正常可用：
+# python3 -V
+Python 3.6.1
+# pip3 -V
+
+(1) -bash: pip3: command not found  不可用
+(2) pip 9.0.1 from /usr/local/python3/lib/python3.6/site-packages (python 3.6)  可用
+
+
+7.不行的话在创建一下pip3的软链接(我也不清楚这一步有什么用)
+
+# ln -s /usr/local/python3/bin/pip3.6 /usr/bin/pip3
+
+[root@iZ2ze2gicjp6mmu1g4beekZ ~]# pip3 -V
+-bash: pip3: command not found
+[root@iZ2ze2gicjp6mmu1g4beekZ ~]# pip3 -V
+pip 9.0.1 from /usr/local/python3/lib/python3.6/site-packages (python 3.6)
+
+
+DEPRECATION: The default format will switch to columns in the future. You can use --format=(legacy|columns) (or define a format=(legacy|columns) in your pip.conf under the [list] section) to disable this warning.
+pip (9.0.1)
+setuptools (28.8.0)
+
+
+后门程序：https://github.com/Kkevsterrr/backdoorme

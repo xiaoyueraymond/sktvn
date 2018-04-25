@@ -1,0 +1,137 @@
+svn安装
+https://ke.qq.com/webcourse/index.html#course_id=193770&term_id=100229617&taid=1104343466177770&vid=j1417v3hke7
+
+【yum安装】
+	yum install subversion* -y
+	创建超级大仓库
+	mkdir -p /var/svn
+	#创建子仓库项目1
+	svnadmin create /var/svn/project1
+	svnadmin create /var/svn/project2
+	
+
+	ll /var/svn/project1
+		conf  配置文件
+		db    数据库存储二进制文件
+	
+	启动超级大仓库
+	svnserve -dr /var/svn/
+
+
+【用户配置】
+	vi /var/svn/project1/conf/authz
+
+		[/]
+			xiaoming = rw
+
+	vi /var/svn/project1/conf/passwd
+		[users]
+			xiaoming = 123
+
+	vi /var/svn/project1/conf/svnserve.conf
+
+        # password-db = passwd →  password-db = passwd 密码开启
+        # authz-db = authz     →  authz-db = authz     权限开启
+        realm = /var/svn/project1/ 
+
+
+
+ 【windows客户端下载】
+ 	  https://osdn.net/projects/tortoisesvn/storage/1.10.0/Application/TortoiseSVN-1.10.0.28176-x64-svn-1.10.0.msi/
+      使用教程https://blog.csdn.net/maplejaw_/article/details/52874348
+
+ 【linux客户端命令】
+ 	#和服务器建立连接,并指定初始化本地仓库
+ 	cd /var/www/html
+ 	svn checkout svn://10.100.13.158/project1 /var/www/html/
+ 		vi /var/www/html/index.html
+ 			first tijiao
+ 	svn add index.html
+ 	svn commit -m "first tijiao" index.php
+ 	rm -rf /var/www/html   删除所有东西
+
+ 	查看提交的数据ll /var/svn/project1/db/revs/0
+
+
+
+
+ 【设置m仓库提交更新到m网站根目录的钩子脚本】
+     【解决报错：D-Bus library appears to be incorrectly set up】
+     	【http://www.torkwrench.com/2011/12/16/d-bus-library-appears-to-be-incorrectly-set-up-failed-to-read-machine-uuid-failed-to-open-varlibdbusmachine-id/】
+     yum install dbus -y
+     /var/lib/dbus/machine-id
+
+ 	  cd /var/www/html
+ 	  svn co svn://10.100.13.158 /var/www/html
+ 	  	root密码
+ 	  	svn用户名
+ 	  	svn密码
+
+ 	  cp /var/svn/project1/hooks/post-commit.tmpl /var/svn/project1/hooks/post-commit
+ 	  chmod a+x /var/svn/project1/hooks/post-commit
+ 	  vi /var/svn/project1/hooks/post-commit
+ 	  	删除所有重写
+ 	  	export LANG=en_US.UTF-8
+ 	  	/usr/bin/svn  update /var/www/html/ --username xiaoming --password 123 
+
+ 【多仓库配置】
+ 		mkdir -p /var/svn/project12
+	    svnadmin create /var/svn/project12
+	    svnserve -dr /var/svn/project12 --listen-port 3691
+
+
+ 【配置apahce】
+    yum install httpd -y
+ 	chkconfig httpd on
+
+ 	vi /etc/httpd/conf/httpd.conf
+		 <Directory />
+		    Options FollowSymLinks
+		    AllowOverride None
+		    Order deny,allow
+		    allow from all
+		  </Directory>
+	AddDefaultCharset gb2312
+	AddDefaultCharset UTF-8
+	Options Indexes FollowSymLinks
+
+	Indexes 的作用就是当该目录下没有 index.html 文件时，就显示目录结构
+	mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
+	如何显示目录 https://www.linuxidc.com/Linux/2014-11/109957.htm
+
+【海豚配置】
+	vi /etc/rc.d/rc.local
+		svnserve -dr /var/svn/
+
+	svnadmin create /var/svn/haitun
+
+	vi /var/svn/haitun/conf/authz
+
+		[/]
+			luoqilin = rw
+
+	vi /var/svn/haitun/conf/passwd
+		[users]
+			luoqilin = 123
+
+	vi /var/svn/haitun/conf/svnserve.conf
+
+        # password-db = passwd →  password-db = passwd 密码开启
+        # authz-db = authz     →  authz-db = authz     权限开启
+        realm = /var/svn/project1/ 
+
+    rm -rf /var/www/html/  
+    mkdir -p /var/www/html/haitun/
+    cd /var/www/html/haitun
+ 	svn checkout svn://10.100.13.158/haitun /var/www/html/haitun
+
+ 	cp /var/svn/haitun/hooks/post-commit.tmpl /var/svn/haitun/hooks/post-commit
+ 	chmod a+x /var/svn/haitun/hooks/post-commit
+ 	vi /var/svn/haitun/hooks/post-commit
+ 	  	删除所有重写
+ 	  	#!/bin/sh
+ 	  	export LANG=en_US.UTF-8
+ 	  	/usr/bin/svn  update /var/www/html/haitun/ --username luoqilin --password 123 
+
+ 
+ 	
