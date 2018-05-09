@@ -1,0 +1,17 @@
+SELECT
+  a.date,
+  b.name 
+
+ 仓库,
+  ca.cn_name 主体,
+  sku,
+  SUM(quantity) 数量
+FROM
+  be_beginning_inventory a
+LEFT JOIN be_warehouse b on b.warehouse_id = a.warehouse_id
+LEFT JOIN be_companys ca on ca.id 
+
+ = a.warehouse_id
+WHERE
+  date = '2018-04-01' AND quantity <> 0
+GROUP BY a.warehouse_id ,sku

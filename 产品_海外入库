@@ -1,0 +1,126 @@
+/*
+全部字段: 入库单号、入库时间、入库仓库、入库类型、品牌、SKU、良品数量、不良品数量、备注、
+  内部交易卖方主体
+  供应商、采购单号、
+*/
+select
+  warehouse_entry_order_sn 入库单号,
+  rkrq 入库时间,
+  w.warehouse_id 入库仓库,ck.name 
+
+ 
+
+ 入库仓库,
+ca.cn_name 主体,
+  w.type 入库类型ID,
+  CASE w.type
+  WHEN 100 THEN '采购入库'
+  WHEN 150 THEN '调拨入库'
+  WHEN 200 THEN '特殊入库'
+  WHEN 300 THEN '库位转移'
+  WHEN 800 THEN '内部关联交易合同入库'
+  WHEN 1400 THEN '调拨回退入库'
+  ELSE '其它' END '入库类型',
+  sku,
+  quantity 良品数量,
+  defective_quentity 不良品数量,
+  note 备注,
+  seller_company_id 内部交易卖方主体ID,(select cn_name from be_companys com where com.id 
+
+ 
+
+ = w.seller_company_id) 内部交易卖方主体,
+  purchase_order_id 采购单号,
+  supplier_id 供应商ID,(select name from be_supplier where supplier_id = w.supplier_id) 供应商名称
+from
+(
+/*
+800 内部关联交易合同入库
+*/
+
+select
+  rkd.warehouse_entry_order_sn,
+  FROM_UNIXTIME(rkd.create_time, '%Y-%m-%d') rkrq,
+  rkd.warehouse_id,
+  rkd.type,
+  rkdi.sku,
+  rkdi.quantity,
+  rkdi.defective_quentity,
+  (select GROUP_CONCAT(note) note from be_warehouse_entry_order_note note where note.warehouse_entry_order_id =rkd.warehouse_entry_order_id) note,
+
+  -- jy.seller_company_id,分仓数据没有汇总到总仓
+  '' seller_company_id,
+  '' purchase_order_id,
+  '' supplier_id
+from
+transfer.be_warehouse_entry_order rkd,transfer.be_warehouse_entry_order_goods rkdi -- ,transfer.be_internal_contracts jy
+where rkd.warehouse_entry_order_id = rkdi.warehouse_entry_order_id
+  -- and rkd.internal_contract_id = jy.id 
+
+ 
+
+  and rkd.type = 800
+
+/*
+  100 '采购入库' 采购入库的有可能 be_batch 不存在采购单号
+select * from be_warehouse_entry_order_storage where warehouse_entry_order_id = '1-f028262c-9dcd-11e6-b65e-00163e003432' ;
+select * from be_warehouse_entry_order where warehouse_entry_order_sn ='WE20161029-1-4' ;
+select * from be_batch where batch_id in
+(
+select batch_id from be_warehouse_entry_order_storage where warehouse_entry_order_id = '1-f028262c-9dcd-11e6-b65e-00163e003432'
+)
+*/
+union all
+select
+  rkd.warehouse_entry_order_sn,
+  FROM_UNIXTIME(rkd.create_time, '%Y-%m-%d') rkrq,
+  rkd.warehouse_id,
+  rkd.type,
+  rkdi.sku,
+  rkdi.quantity,
+  rkdi.defective_quentity,
+  (select GROUP_CONCAT(note) note from be_warehouse_entry_order_note note where note.warehouse_entry_order_id =rkd.warehouse_entry_order_id) note,
+
+  '' seller_company_id,
+  pur.ht_erp_purchase_order_id purchase_order_id,
+  pur.supplier_id
+from
+    be_warehouse_entry_order rkd
+  LEFT JOIN be_warehouse_entry_order_goods rkdi on rkdi.warehouse_entry_order_id = rkd.warehouse_entry_order_id
+  LEFT JOIN be_arrival_prediction_order apo on apo.arrival_prediction_order_sn = rkdi.from_order_sn and rkdi.from_order_type = 'arrival_prediction_order'
+  LEFT JOIN be_purchase_order pur on pur.purchase_order_sn = apo.purchase_order_sn
+where rkd.type = 100
+/*
+  150 '调拨入库'
+  200 '特殊入库'
+  300 '库位转移'
+*/
+union all
+select
+  rkd.warehouse_entry_order_sn,
+  FROM_UNIXTIME(rkd.create_time, '%Y-%m-%d') rkrq,
+  rkd.warehouse_id,
+  rkd.type,
+  rkdi.sku,
+  rkdi.quantity,
+  rkdi.defective_quentity,
+  (select GROUP_CONCAT(note) note from be_warehouse_entry_order_note note where note.warehouse_entry_order_id =rkd.warehouse_entry_order_id) note,
+
+  '' seller_company_id,
+  '' purchase_order_id,
+  '' supplier_id
+from
+  transfer.be_warehouse_entry_order rkd,transfer.be_warehouse_entry_order_goods rkdi
+where
+  rkd.type not in (100,800)
+  and rkd.warehouse_entry_order_id = rkdi.warehouse_entry_order_id
+) w
+LEFT JOIN be_warehouse ck ON ck.warehouse_id = w.warehouse_id
+LEFT JOIN be_companys ca on ca.id 
+
+ 
+
+ = ck.company_id
+where
+  w.rkrq>='2017-12-01'
+  and w.rkrq<'2017-12-02'

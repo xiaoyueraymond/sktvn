@@ -1,0 +1,166 @@
+/*
+全部字段: 入库单号、入库时间、入库仓库、品牌、SKU、数量、入库类型、备注、
+  供应商、采购单号、币种、原币种单价
+  BBC客户、BBC销售单号
+  调拨单号、海外仓调拨单号、调拨出库仓库
+*/
+select
+  w.id 入库单号,
+  op_time 入库时间,
+  warehouse_id 入库仓库ID,
+  (select name from warehouses ck where ck.id 
+
+ = w.warehouse_id) 入库仓库,
+  (select brand from skus where sku =w.`sku`) 品牌,
+  sku,warehouse_quantity 入库数量,
+  (select value from statusdics s where s.table = 'warehouseorders' and colum_name ='type' and s.number=w.type) 入库类型,
+  remark 入库备注,
+  supplier_id 供应商ID,
+  (select cn_name from suppliers where id = w.supplier_id) 供应商中文,
+  (select en_name from suppliers where id = w.supplier_id) 供应商英文,
+  purchaseorder_id 采购单号,
+  coin 币种,
+  price 原币种单价,
+  BBC_account BBC客户,
+  BBC_order BBC销售单号,
+  dbd_id 调拨单号,
+  dbd_oversea_delivery_sn 海外仓调拨单号,
+  dbd_begin_warehouse_id 调拨出库仓库ID,
+  (select name from warehouses ck where ck.id 
+
+ = w.dbd_begin_warehouse_id) 调拨单出库仓库,
+  cn_name 主体
+from
+(
+/*
+*90 退货（实际退货）
+*/
+
+SELECT
+  rkd.id 
+
+ ,
+  rkd.op_time ,
+  rkd.warehouse_id,
+  rkd.sku,
+  rkd.`warehouse_quantity` ,
+  rkd.type,
+  rkd.`remark`,
+  rkd.company_id,
+  rkd.supplier_id,
+  rkd.purchaseorder_id,
+  '' coin,
+  '' price,
+  re.sales_account BBC_account,
+  re.erp_orders_sn BBC_order,
+  '' dbd_id,
+  '' dbd_oversea_delivery_sn,
+  '' dbd_begin_warehouse_id
+from warehouseorders rkd
+LEFT JOIN erp_order_products_return pr on pr.id 
+
+ = rkd.erp_orders_return_id
+LEFT JOIN erp_orders_return re on re.id 
+
+ = pr.erp_orders_return_id
+where rkd.type = 90
+-- and re.id 
+
+ = 4885
+union all
+
+/*
+*60 调拨入库
+*
+*/
+SELECT
+  rkd.id 
+
+ ,
+  rkd.op_time ,
+  rkd.warehouse_id,
+  rkd.sku,
+  rkd.`warehouse_quantity` ,
+  rkd.type,
+  rkd.`remark`,
+  rkd.company_id,
+  rkd.supplier_id,
+  rkd.purchaseorder_id,
+  '' coin,
+  '' price,
+  '' BBC_account,
+  '' BBC_order,
+  dbd.id 
+
+ dbd_id,
+  dbd.oversea_delivery_sn dbd_oversea_delivery_sn,
+  dbd.begin_warehouse_id dbd_begin_warehouse_id
+
+from warehouseorders rkd,
+  inventory_allot_detail dbdi,
+  inventory_allot dbd
+where
+  dbd.id 
+
+ = dbdi.inventory_allot_id
+  and dbdi.id 
+
+ = rkd.inventory_allot_detail_id
+  and rkd.type = 60
+union all
+
+/*
+10 正常采购入库
+20 已生成出库单未发货订单取消拦截补回入库单【原称:退货(取消订单)】
+30 内部关联交易合同入库
+40 供应商礼物
+50 样品归还
+70 其它/库位调整
+80 B2B订单退货入库
+100 补做接口错误的疏漏数据
+110 冲抵录入错误
+120 盘点盘盈入库
+130 调拨单实际到货与系统调拨单SKU差异调整入库
+140 代发仓虚拟入库
+150 包材入库
+
+*/
+SELECT
+  rkd.id 
+
+ ,
+  rkd.op_time ,
+  rkd.warehouse_id,
+  rkd.sku,
+  rkd.`warehouse_quantity` ,
+  rkd.type,
+  rkd.`remark`,
+  rkd.company_id,
+  rkd.supplier_id,
+  rkd.purchaseorder_id,
+  coin.coin coin,
+  purchaseorder_details.single_price price,
+  '' BBC_account,
+  '' BBC_order,
+  '' dbd_id,
+  '' dbd_oversea_delivery_sn,
+  '' dbd_begin_warehouse_id
+FROM
+  `warehouseorders` rkd
+  LEFT JOIN
+  `purchaseorder_details` ON rkd.`purchaseorder_id` = `purchaseorder_details`.`purchaseorder_id`
+  AND rkd.`sku` = `purchaseorder_details`.`sku`
+  AND `purchaseorder_details`.`status` != 100
+  LEFT JOIN
+  coin ON `coin`.`coin_id` = `purchaseorder_details`.`currency`
+WHERE rkd.type not in (60,90)
+) w
+LEFT JOIN warehouses wa ON wa.id 
+
+ = w.warehouse_id
+LEFT JOIN companys cs on cs.id 
+
+ = w.company_id
+where wa.international =0
+AND w.op_time < '2017-12-02'
+  AND w.op_time >= '2017-12-01'

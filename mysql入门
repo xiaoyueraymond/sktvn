@@ -87,11 +87,11 @@ https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1
 【MySQLsql语句的分类】
 	DDL 数据库定义语言 -data defination
 		创建 删除 修改表结构
-	DML 数据造作语言-data manipulation
+	DML 数据操作语言-data manipulation
 		增删改表的记录
 	DCL 数据控制语言-data control
 		用户的创建以及授权
-	DQL 数据查询云烟-data query
+	DQL 数据查询语言-data query
 		查询数据
 
 	DDL
@@ -101,24 +101,24 @@ https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1
 		DROP DATABASE + 数据库名字;
 
 	DML 
-	username   emial   age   fee   data
+	usersname   emial   age   fee   data
 
-mysql> CREATE TABLE USER(
+CREATE TABLE users(
     id字段 整型 无符号 不为空     自动递增      注释    ,待续
     -> id int unsigned not null auto_increment comment '用户ID',
 
-mysql> CREATE TABLE USER(
+CREATE TABLE users(
     -> id int unsigned not null auto_increment comment '用户ID',
-    -> user_name varchar(20) not null comment '用户名',
+    -> users_name varchar(20) not null comment '用户名',
     -> email varchar(50) not null comment '用户邮箱',
     -> age tinyint unsigned not null comment '用户年龄',
     -> fee decimal(10,2) not null default 0.00 comment '用户余额',
     -> created_at timestamp not null comment '注册时间',
     -> primary key(id)
 
-CREATE TABLE USER(
+CREATE TABLE users(
 id int unsigned not null auto_increment comment '用户ID',
-user_name varchar(20) not null comment '用户名',
+users_name varchar(20) not null comment '用户名',
 email varchar(50) not null comment '用户邮箱',
 age tinyint unsigned not null comment '用户年龄',
 fee decimal(10,2) not null default 0.00 comment '用户余额',
@@ -127,12 +127,12 @@ primary key(id)
 );
 
 --------------------------------------------------------------------------------------------------
-mysql> DESC USER;
+DESC users;
 +------------+---------------------+------+-----+-------------------+-----------------------------+
 | Field      | Type                | Null | Key | Default           | Extra                       |
 +------------+---------------------+------+-----+-------------------+-----------------------------+
 | id         | int(10) unsigned    | NO   | PRI | NULL              | auto_increment              |
-| user_name  | varchar(20)         | NO   |     | NULL              |                             |
+| users_name  | varchar(20)         | NO   |     | NULL              |                             |
 | email      | varchar(50)         | NO   |     | NULL              |                             |
 | age        | tinyint(3) unsigned | NO   |     | NULL              |                             |
 | fee        | decimal(10,2)       | NO   |     | 0.00              |                             |
@@ -140,13 +140,13 @@ mysql> DESC USER;
 +------------+---------------------+------+-----+-------------------+-----------------------------+
 6 rows in set (0.00 sec)
 
-mysql> SHOW CREATE TABLE USER;
+SHOW CREATE TABLE users;
 +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Table | Create Table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| USER  | CREATE TABLE `USER` (
+| users  | CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `user_name` varchar(20) NOT NULL COMMENT '用户名',
+  `users_name` varchar(20) NOT NULL COMMENT '用户名',
   `email` varchar(50) NOT NULL COMMENT '用户邮箱',
   `age` tinyint(3) unsigned NOT NULL COMMENT '用户年龄',
   `fee` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '用户余额',
@@ -156,34 +156,37 @@ mysql> SHOW CREATE TABLE USER;
 +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 1 row in set (0.00 sec)
 
-mysql> 
+
 
 ---------------------------------------------------------------------------------------------------
 DDL
 
 【修改表字段】
- 	修改表USER 里面的 username_name 字段为varchar(50) not null
-	ALTER TABLE USER MODIFY user_name varchar(50);
-	ALTER TABLE USER MODIFY user_name  varchar(50) not null;
+ 	修改表users 里面的 usersname_name 字段为varchar(50) not null
+	ALTER TABLE users MODIFY users_name varchar(50);
+	ALTER TABLE users MODIFY users_name  varchar(50) not null;
 
- 	修改表USER 里面的 email 字段为 user_email varchar(50) not null
-	alter table USER change email user_email varchar(50) not null;
+ 	修改表users 里面的 email 字段为 users_email varchar(50) not null
+	alter table users change email users_email varchar(50) not null;
+  alter table users change user_name users_name varchar(50) not null;
+  alter table users change moblie mobile char(11) not null;
 
 	添加字段
-	alter table USER add password char(32) not null comment '用户密码';
+	alter table users add password char(32) not null comment '用户密码';
+  ALTER TABLE users MODIFY password  varchar(100) not null;
 
 	添加字段
-	alter table USER add password char(32) not null comment '用户密码' after name;
-	alter table USER add moblie char(11) not null comment '手机号码';
+	alter table users add password char(32) not null comment '用户密码' after users_name;
+	alter table users add mobile char(11) not null comment '手机号码';
 
 
-mysql> DESC USER;
+DESC users;
 +------------+---------------------+------+-----+-------------------+-----------------------------+
 | Field      | Type                | Null | Key | Default           | Extra                       |
 +------------+---------------------+------+-----+-------------------+-----------------------------+
 | id         | int(10) unsigned    | NO   | PRI | NULL              | auto_increment              |
-| user_name  | varchar(50)         | NO   |     | NULL              |                             |
-| user_email | varchar(50)         | NO   |     | NULL              |                             |
+| users_name  | varchar(50)         | NO   |     | NULL              |                             |
+| users_email | varchar(50)         | NO   |     | NULL              |                             |
 | age        | tinyint(3) unsigned | NO   |     | NULL              |                             |
 | fee        | decimal(10,2)       | NO   |     | 0.00              |                             |
 | created_at | timestamp           | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
@@ -192,19 +195,19 @@ mysql> DESC USER;
 +------------+---------------------+------+-----+-------------------+-----------------------------+
 8 rows in set (0.00 sec)
 
-mysql> 
+
 
 
 【修改表名】
-	alter tables user rename users;
+	alter tables users rename users;
 
-mysql> DESC users;
+DESC users;
 +------------+---------------------+------+-----+-------------------+-----------------------------+
 | Field      | Type                | Null | Key | Default           | Extra                       |
 +------------+---------------------+------+-----+-------------------+-----------------------------+
 | id         | int(10) unsigned    | NO   | PRI | NULL              | auto_increment              |
-| user_name  | varchar(50)         | NO   |     | NULL              |                             |
-| user_email | varchar(50)         | NO   |     | NULL              |                             |
+| users_name  | varchar(50)         | NO   |     | NULL              |                             |
+| users_email | varchar(50)         | NO   |     | NULL              |                             |
 | age        | tinyint(3) unsigned | NO   |     | NULL              |                             |
 | fee        | decimal(10,2)       | NO   |     | 0.00              |                             |
 | created_at | timestamp           | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
@@ -216,20 +219,948 @@ mysql> DESC users;
 
 https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830102744974832&vid=o14210cj7s0
 
-DML
-【MySQL之DML插入数据库的几种方法】
- 	insert into USER (user_name,user_email,age,fee,created_at,password,mobile) values ('Jack','jack@youkeshu.com',18,99.99,'2017-08-30 11:34:25',password('123'),'12345678901');
+
+【DML-MySQL之DML插入数据库的几种方法】
+ 	insert into users (users_name,users_email,age,fee,created_at,password,mobile) values ('Jack','jack@youkeshu.com',18,99.99,'2017-08-30 11:34:25',password('123'),'12345678901');
 
 select * from users;
 
-mysql> select * from users;
+select * from users;
 +----+-----------+-------------------+-----+-------+---------------------+-------------------------------------------+-------------+
-| id | user_name | user_email        | age | fee   | created_at          | password                                  | mobile      |
+| id | users_name | users_email        | age | fee   | created_at          | password                                  | mobile      |
 +----+-----------+-------------------+-----+-------+---------------------+-------------------------------------------+-------------+
 |  1 | Jack      | jack@youkeshu.com |  18 | 99.99 | 2017-08-30 11:34:25 | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 | 12345678901 |
 +----+-----------+-------------------+-----+-------+---------------------+-------------------------------------------+-------------+
 1 row in set (0.00 sec)
 
 
-insert into users (user_name,user_email,age,password,mobile) values ('liudehua','liudehua@youkeshu.com',18,'123','12312312312');
-insert into users values (3,'liming','liming@youkeshu.com','28','983','2015-08-30 11:34:25','1234123','93847382911');
+insert into users (users_name,users_email,age,password,mobile) values ('liudehua','liudehua@youkeshu.com',18,'123','12312312312');
+insert into users values (3,'liming2','123456','liming@youkeshu.com','28','983','2015-08-30 11:34:25','93847382911');
+
+update users set users_name='刘俊国' where id=3;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+select * from users;
++----+-----------+-----------------------+-----+--------+---------------------+-------------------------------------------+-------------+
+| id | users_name | users_email            | age | fee    | created_at          | password                                  | mobile      |
++----+-----------+-----------------------+-----+--------+---------------------+-------------------------------------------+-------------+
+|  1 | Jack      | jack@youkeshu.com     |  18 |  99.99 | 2017-08-30 11:34:25 | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 | 12345678901 |
+|  2 | liudehua  | liudehua@youkeshu.com |  18 |   0.00 | 2018-04-24 18:25:40 | 123                                       | 12312312312 |
+|  3 | 刘俊国    | liming@youkeshu.com   |  28 | 983.00 | 2018-04-25 17:25:13 | 1234123                                   | 93847382911 |
++----+-----------+-----------------------+-----+--------+---------------------+-------------------------------------------+-------------+
+3 rows in set (0.00 sec)
+
+show variables like '%char%';
+
++--------------------------+-----------------------------------------+
+| Variable_name            | Value                                   |
++--------------------------+-----------------------------------------+
+| character_set_client     | utf8   客户端设置                                 |
+| character_set_connection | utf8   客户端设置                                 |
+| character_set_database   | utf8                                    |
+| character_set_filesystem | binary                                  |
+| character_set_results    | utf8                                    |
+| character_set_server     | utf8                                    |
+| character_set_system     | utf8                                    |
+| character_sets_dir       | /usr/local/mysql-5.6.10/share/charsets/ |
++--------------------------+-----------------------------------------+
+8 rows in set (0.00 sec)
+
+\q
+
+【MySQL之DML数据的更新】
+    
+    update users set age=100;
+    update users set age=200 where id=1;
+    update users set users_name='rose' where id=1;
+    update users set fee=11.11 where fee=0.00;
+    update users set users_name="chenhe" where users_name!='a';
+    update users set users_email='haha@shabi.com' where users_email='';
+    update users set users_name='zhangxueyou' where id in(1,2,3);
+    update users set users_name='zhangguorong' where id between 2 and 3;
+    update users set users_name='zhangxueyou',users_email='haha@shabi.com' where id=1;
+    delete from users where id=5;
+
+删库到跑路
+    delete from users; 清空数据库，同时primary key(id)，继续递增。
+    desc users;
+    delete from users where id=6;
+    truncate users;    清空数据库,同时primary key(id)，ID变为1。
+
+【MySQL之DCL设置root指定的ip访问】
+    不要用root连接数据库
+    创建用户
+      CREATE users 'dog'@'localhost' IDENTIFIED BY '123456';
+      CREATE users 'pig'@'192.168.1.101_' IDENDIFIED BY '123456';
+      CREATE users 'pig'@'%' IDENTIFIED BY '123456';
+      CREATE users 'pig'@'%' IDENTIFIED BY '';
+      CREATE users 'pig'@'%';
+
+      select users,host,password from mysql.users;
+      select users,host from mysql.users;
+
+
+    授权
+      GRANT SELECT, INSERT ON test.users TO 'pig'@'%';
+      GRANT ALL ON *.* TO 'pig'@'%';
+      用以上命令授权的用户不能给其它用户授权，如果想让该用户可以授权，用以下命令:
+      GRANT privileges ON databasename.tablename TO 'usersname'@'host' WITH GRANT OPTION;
+      flush privileges;
+
+    设置与更改用户密码
+      SET PASSWORD FOR 'pig'@'%' = PASSWORD("123456");
+      mysqladmin -uroot -padmin password 123456
+      update mysql.users set password=PASSWORD('123456') where users='root';
+      flush privileges;
+
+      
+
+
+    撤销用户权限
+      REVOKE SELECT ON *.* FROM 'pig'@'%';
+
+      mysql -uroot -h127.0.0.1 -p
+        -h 远程数据库地址
+
+【用户白名单】
+    select users,host from mysql.users;
+    +------+-----------------------+
+    | users | host                  |
+    +------+-----------------------+
+    | pig  | %                     |
+    | jack | localhost             |
+    | root | localhost             |
+    | test | localhost             |
+    |      | localhost.localdomain |
+    +------+-----------------------+
+    5 rows in set (0.00 sec)
+
+    
+
+【数据库忘记密码】
+    首先停止mysql服务进程
+
+    service mysqld stop       
+    然后编辑mysql的配置文件my.cnf
+
+    vim /etc/my.cnf      
+    找到 **[mysqld]**这个模块
+    在最后面添加一段代码
+
+    skip-grant-tables   ##忽略mysql权限问题，直接登录      
+    然后保存 :wq!退出
+    启动mysql服务：
+
+    service mysqld start      
+    直接进入mysql数据库
+
+    mysql      
+    使用mysql表，然后进行修改mysql的root密码
+
+    use mysql; ##使用mysql数据库      
+    Database changed      
+    update users set password=password("121312321") where users="root";##更新密码      
+    Query OK, 4 rows affected (0.00 sec)      
+    Rows matched: 4  Changed: 4  Warnings: 0      
+    flush privileges;##刷新权限      
+    Query OK, 0 rows affected (0.00 sec)      
+    quit       
+    Bye       
+    将MySQL的登录验证修改回来
+
+    vi /etc/my.cnf       
+    将刚才在**[mysqld]的段中加上的skip-grant-tables**删除
+
+    保存并且退出vi。
+
+    重新启动mysqld
+
+    service mysqld start       
+    Starting MySQL. SUCCESS!  
+
+【MySQL之DCL普通用户的创建授权以及权限回收】
+    create users 'dandan'@'192.168.8.11' identified by '123456';
+    create users 'dandan'@'%' identified by '123456';
+        %：匹配任何ip；
+    create users 'zhajinhua'@'10.100.13.131' identified by '123456'; 
+
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830132809745904&vid=n1421cdo786
+【授权】
+    grant 权限1，权限2 on 数据库名.* to 用户
+    grant update,insert,delete on shop.* to 'test'@'%';
+    flush privileges;
+    grant select,delete,update,insert on shop.* to 'aiying'@'10.100.13.131' identified by '123456';
+
+
+
+【去权】
+    revoke select on shop.* from 'test'@'%';
+    grant all on *.* to 'zhajinhua'@'10.100.13.131';
+    select Select_priv from mysql.users;
+    select users,host,Select_priv from mysql.users;
+    无法去除，用户不存在
+    revoke select on *.* from 'zhajinhua'@'%';
+-----------------------------------------------------------
+mysql数据库中users表的host字段，是用来控制用户访问数据库“权限”的。
+可以使用“%”，表示所有的网段；
+也可以使用具体的ip地址，表示只有该ip的客户端才可以登录到mysql服务器；
+也可以使用“_”进行模糊匹配，表示某个网段的客户端可以登录到mysql服务器。
+如果在users表中存在一个用户两条不同host值的记录，那么mysql服务器该如何匹配该用户的权限呢？
+mysql采用的策略是：当服务器读取users表时，它首先以最具体的Host值排序（主机名和IP号是最具体的） 。有相同Host值的条目首先以最具体的users匹配。
+https://blog.csdn.net/liuxiao723846/article/details/49583827
+-------------------------------------------------------------------
+    
+    show grants for 'aiying'@'10.100.13.131';
+
+【MySQL之DQL查询AS CONCAT LIKE的使用】
+    select users_name,password,users_email,id from shop.users where users_name='wuaiying';
+
+------------------------------------------------
+select * from shop.users;
++----+------------+-------------------------------------------+-----------------------+-----+--------+---------------------+-------------+
+| id | users_name | password                                  | users_email           | age | fee    | created_at          | mobile      |
++----+------------+-------------------------------------------+-----------------------+-----+--------+---------------------+-------------+
+|  1 | Jack       | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 | jack@youkeshu.com     |  18 |  99.99 | 2017-08-30 11:34:25 | 12345678901 |
+|  2 | liudehua   | 123                                       | liudehua@youkeshu.com |  18 |   0.00 | 2018-04-18 21:44:56 | 12312312312 |
+|  3 | liming     | 123456                                    | liming@youkeshu.com   |  28 | 983.00 | 2015-08-30 11:34:25 | 93847382911 |
+|  4 | liming2    | 123456                                    | liming@youkeshu.com   |  28 | 983.00 | 2015-08-30 11:34:25 | 93847382911 |
++----+------------+-------------------------------------------+-----------------------+-----+--------+---------------------+-------------+
+4 rows in set (0.00 sec)
+
+------------------------------------------------
+    提取重复的字段,重复的值只显示一次
+        select distinct(password) from users;
+
+        -----------------------------------------
+        +-------------------------------------------+
+        | password                                  |
+        +-------------------------------------------+
+        | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 |
+        | 123                                       |
+        | 123456                                    |
+        +-------------------------------------------+
+        3 rows in set (0.00 sec)
+        -----------------------------------------
+
+    连接字段
+
+        select concat(users_name,users_email) from users;
+        +--------------------------------+
+        | concat(users_name,users_email) |
+        +--------------------------------+
+        | Jackjack@youkeshu.com          |
+        | liudehualiudehua@youkeshu.com  |
+        | limingliming@youkeshu.com      |
+        | liming2liming@youkeshu.com     |
+        +--------------------------------+
+        4 rows in set (0.00 sec)
+
+        select concat(users_name,users_email) as ne from users;
+        +-------------------------------+
+        | ne                            |
+        +-------------------------------+
+        | Jackjack@youkeshu.com         |
+        | liudehualiudehua@youkeshu.com |
+        | limingliming@youkeshu.com     |
+        | liming2liming@youkeshu.com    |
+        +-------------------------------+
+        4 rows in set (0.00 sec)
+
+    连接字段_分隔符
+
+        select concat_ws('==',users_name,users_email) as ne from users;
+        +---------------------------------+
+        | ne                              |
+        +---------------------------------+
+        | Jack==jack@youkeshu.com         |
+        | liudehua==liudehua@youkeshu.com |
+        | liming==liming@youkeshu.com     |
+        | liming2==liming@youkeshu.com    |
+        +---------------------------------+
+        4 rows in set (0.00 sec)
+
+    查询显示重新命名
+        select users_name as na,users_email as em from users;
+        +----------+-----------------------+
+        | na       | em                    |
+        +----------+-----------------------+
+        | Jack     | jack@youkeshu.com     |
+        | liudehua | liudehua@youkeshu.com |
+        | liming   | liming@youkeshu.com   |
+        | liming2  | liming@youkeshu.com   |
+        +----------+-----------------------+
+        4 rows in set (0.00 sec)
+
+    模糊查询like  数据量小于10w
+
+         select users_name from users where users_name like 'liming';
+        +------------+
+        | users_name |
+        +------------+
+        | liming     |
+        +------------+
+        1 row in set (0.00 sec)
+
+        select users_name from users where users_name like '%ng%';
+        +------------+
+        | users_name |
+        +------------+
+        | liming     |
+        | liming2    |
+        +------------+
+        2 rows in set (0.00 sec)
+
+MySQL之DQL排序以及聚合函数
+
+      select users_name,id from users order by id asc;--默认顺序
+        +------------+----+
+        | users_name | id |
+        +------------+----+
+        | Jack       |  1 |
+        | liudehua   |  2 |
+        | liming     |  3 |
+        | liming2    |  4 |
+        +------------+----+
+        4 rows in set (0.00 sec)    
+         
+        select users_name,id from users order by id desc;
+        +------------+----+
+        | users_name | id |
+        +------------+----+
+        | liming2    |  4 |
+        | liming     |  3 |
+        | liudehua   |  2 |
+        | Jack       |  1 |
+        +------------+----+
+        4 rows in set (0.00 sec)
+
+聚合函数
+        select count(*) from users;
+        +----------+
+        | count(*) |
+        +----------+
+        |        4 |
+        +----------+
+        1 row in set (0.00 sec)
+
+求和
+      select sum(age) from users; 
+        select sum(age) from users;
+        +----------+
+        | sum(age) |
+        +----------+
+        |       92 |
+        +----------+
+        1 row in set (0.00 sec)
+
+      select sum(age) as sum_age from users;
+      +---------+
+      | sum_age |
+      +---------+
+      |      92 |
+      +---------+
+      1 row in set (0.00 sec)
+
+平均数 
+
+      select avg(age) as age_avg from users;
+      +---------+
+      | age_avg |
+      +---------+
+      | 23.0000 |
+      +---------+
+      1 row in set (0.00 sec)
+
+最大值max 最小值min
+
+      select max(age) as age_max from users;
+      +---------+
+      | age_max |
+      +---------+
+      |      28 |
+      +---------+
+      1 row in set (0.00 sec)
+
+alter table users add sex enum('F','M') not null;
+alter table users add sex2 tinyint unsigned not null default 1 comment '0女1男' after age;
+
+
+| users | CREATE TABLE `users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `users_name` varchar(50) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `users_email` varchar(50) NOT NULL,
+  `age` tinyint(3) unsigned NOT NULL COMMENT '用户年龄',
+  `sex2` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '0女1男',
+  `fee` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '用户余额',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '注册时间',
+  `mobile` char(11) NOT NULL,
+  `sex` enum('F','M') NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8   
+
+
+    select id,users_name,sex2 from users;
+    +----+------------+------+
+    | id | users_name | sex2 |
+    +----+------------+------+
+    |  1 | Jack       |    1 |
+    |  2 | liudehua   |    1 |
+    |  3 | liming     |    1 |
+    |  4 | liming2    |    1 |
+    +----+------------+------+
+    4 rows in set (0.00 sec)
+
+分组--查看有多少男的，多少女的
+    select count(*),sex2 from users group by sex2;
+    +----------+------+
+    | count(*) | sex2 |
+    +----------+------+
+    |        2 |    0 |
+    |        2 |    1 |
+    +----------+------+
+    2 rows in set (0.00 sec)
+
+sex2的0或1的个数为2的条目
+
+    select count(*),sex2 from users group by sex2 having count(*)=2;
+    +----------+------+
+    | count(*) | sex2 |
+    +----------+------+
+    |        2 |    0 |
+    |        2 |    1 |
+    +----------+------+
+    2 rows in set (0.00 sec)
+
+创建表student和mark
+
+CREATE TABLE `student`(
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) NOT NULL,
+  `age` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+)ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8; 
+
+insert into `student` values (1,'小王','16'),(2,'小红','45'),(3,'张明','45'),(4,'小李子','87'),(5,'王强','58');
+select * from student;
++----+-----------+-----+
+| id | name      | age |
++----+-----------+-----+
+|  1 | 小王      |  16 |
+|  2 | 小红      |  45 |
+|  3 | 张明      |  45 |
+|  4 | 小李子    |  87 |
+|  5 | 王强      |  58 |
++----+-----------+-----+
+5 rows in set (0.00 sec)
+
+
+create table `mark`(
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `mark` int(10) unsigned NOT NULL,
+  `stu_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+)ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8; 
+
+insert into `mark` values (1,61,2),(2,58,4),(3,37,3);
+select * from mark;
++----+------+--------+
+| id | mark | stu_id |
++----+------+--------+
+|  1 |   61 |      2 |
+|  2 |   58 |      2 |
+|  3 |   37 |      3 |
++----+------+--------+
+3 rows in set (0.00 sec)
+
+
+
+连接查询_查出学生的成绩
+
+内连接查询
+
+select name,mark from student,mark where mark.stu_id=student.id;
++--------+------+
+| name   | mark |
++--------+------+
+| 小红   |   61 |
+| 小红   |   58 |
+| 张明   |   37 |
++--------+------+
+3 rows in set (0.00 sec)
+
+select s.name,m.mark from student as s,mark as m  where m.stu_id=s.id;
+select s.name,m.mark from student as s inner join mark as m  where m.stu_id=s.id;
+
++--------+------+
+| name   | mark |
++--------+------+
+| 小红   |   61 |
+| 小红   |   58 |
+| 张明   |   37 |
++--------+------+
+3 rows in set (0.00 sec)
+
+左连接，以左边的表的基准
+select s.id,s.name,m.mark from student as s left join mark as m  on m.stu_id=s.id order by id;
++----+-----------+------+
+| id | name      | mark |
++----+-----------+------+
+|  1 | 小王      | NULL |
+|  2 | 小红      |   61 |
+|  2 | 小红      |   58 |
+|  3 | 张明      |   37 |
+|  4 | 小李子    | NULL |
+|  5 | 王强      | NULL |
++----+-----------+------+
+6 rows in set (0.00 sec)
+
+右连接，以右的表的基准
+delete from  student where id=3;
+select s.id,s.name,m.mark from student as s right join mark as m  on m.stu_id=s.id order by mark;
++------+--------+------+
+| id   | name   | mark |
++------+--------+------+
+| NULL | NULL   |   37 |
+|    2 | 小红   |   58 |
+|    2 | 小红   |   61 |
++------+--------+------+
+3 rows in set (0.00 sec)
+
+
+联合查询
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830162874516976&vid=b1421nplh7u
+select name,age from student union all select mark,stu_id from mark;
++-----------+-----+
+| name      | age |
++-----------+-----+
+| 小王      |  16 |
+| 小红      |  45 |
+| 小李子    |  87 |
+| 王强      |  58 |
+| 61        |   2 |
+| 58        |   2 |
+| 37        |   3 |
++-----------+-----+
+7 rows in set (0.00 sec)
+
+前后字段个数必须一致
+mysql> select * from student where id=2 union all select * from student where id=5;
++----+--------+-----+
+| id | name   | age |
++----+--------+-----+
+|  2 | 小红   |  45 |
+|  5 | 王强   |  58 |
++----+--------+-----+
+2 rows in set (0.00 sec)
+
+
+
+子查询
+
+mysql> select id from student where id in (select stu_id from mark);
++----+
+| id |
++----+
+|  2 |
++----+
+1 row in set (0.00 sec)
+
+
+MySQL之DQL限制条数limit的使用
+
+mysql> select * from student limit 1;
++----+--------+-----+
+| id | name   | age |
++----+--------+-----+
+|  1 | 小王   |  16 |
++----+--------+-----+
+1 row in set (0.00 sec)
+
+mysql> select id from student order by id desc limit 2;
++----+
+| id |
++----+
+|  5 |
+|  4 |
++----+
+2 rows in set (0.00 sec)
+
+从第2条后往后取2条
+mysql> select * from student limit 2,2;
++----+-----------+-----+
+| id | name      | age |
++----+-----------+-----+
+|  4 | 小李子    |  87 |
+|  5 | 王强      |  58 |
++----+-----------+-----+
+2 rows in set (0.00 sec)
+
+
+insert into `student` values (7,'小鹰','16'),(8,'小白','45'),(9,'张飞','45'),(10,'小抛子','87'),(11,'文健','58');
+insert into `student` values (3,'小Y','26'),(6,'MK','25');
+select * from student;
+
+mysql> select * from student;
++----+-----------+-----+
+| id | name      | age |
++----+-----------+-----+
+|  1 | 小王      |  16 |
+|  2 | 小红      |  45 |
+|  3 | 小Y       |  26 |
+|  4 | 小李子    |  87 |
+|  5 | 王强      |  58 |
+|  6 | MK        |  25 |
+|  7 | 小鹰      |  16 |
+|  8 | 小白      |  45 |
+|  9 | 张飞      |  45 |
+| 10 | 小抛子    |  87 |
+| 11 | 文健      |  58 |
++----+-----------+-----+
+11 rows in set (0.00 sec)
+
+
+MySQL存储引擎之各种引擎介绍修改查看引擎
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830175759418864&vid=m1421eajknt
+
+    MyLSAM 全文索引 不支持事务
+    InnoDB 支持事务 不支持全文索引 5.6版本后开始支持 5.6开始默认的数据库引擎
+      CSV
+      BLACKHOLE
+      MEMORY
+      ARCHIVE
+
+mysql> show table status\G;
+*************************** 1. row ***************************
+           Name: mark
+         Engine: InnoDB
+
+创建表的时候可以指定引擎
+修改引擎
+  alter table test2 engine=innodb;
+
+
+MySQL存储引擎之MyISAM和InnoDB的区别
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830180054386160&vid=s1421e1ho8i
+    MYlSAM 全文索引full text 不支持事务
+        表级锁
+        奔溃恢复支持不好
+        数量小，MYlSAM速度快
+
+    InnoDB 支持事务 不支持全文索引
+        行级锁
+        不支持全文索引 5.6版本后开始支持
+
+    5.6以后的是InnoDB，5.6以前的可以修改配置文件，或者创建表的时候可以指定引擎
+        show create table table3
+
+字符集
+    utf8-万国码
+    gbk  中文的
+
+    show character set;
+
+mysql> show variables like '%char%';
+      可以修改配置文件
++--------------------------+-----------------------------------------+
+| Variable_name            | Value                                   |
++--------------------------+-----------------------------------------+
+| character_set_client     | utf8                                    |
+| character_set_connection | utf8                                    |
+| character_set_database   | utf8                                    |
+| character_set_filesystem | binary                                  |
+| character_set_results    | utf8                                    |
+| character_set_server     | utf8                                    |
+| character_set_system     | utf8                                    |
+| character_sets_dir       | /usr/local/mysql-5.6.10/share/charsets/ |
++--------------------------+-----------------------------------------+
+8 rows in set (0.00 sec)
+
+存的是utf8，终端的编码是gbk，则会乱码；
+
+MySQL之默认字符集的修改设置,一般用utf8；
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830188644320752&vid=k142172dawh
+mysql> show create database test;
++----------+---------------------------------------------------------------+
+| Database | Create Database                                               |
++----------+---------------------------------------------------------------+
+| test     | CREATE DATABASE `test` /*!40100 DEFAULT CHARACTER SET utf8 */ |
++----------+---------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+  SHOW CREATE TABLE users;
+  mysql> create database test1 set character gbk;
+
+  mysql> show create database test1;
+  +----------+---------------------------------------------------------------+
+  | Database | Create Database                                               |
+  +----------+---------------------------------------------------------------+
+  | test1    | CREATE DATABASE `test1` /*!40100 DEFAULT CHARACTER SET gbk */ |
+  +----------+---------------------------------------------------------------+
+  1 row in set (0.00 sec)
+
+  create table shop.test4(name varchar(5)) engine=innodb charset=gbk;
+  mysql> show create table shop.test4;
+  +-------+---------------------------------------------------------------------------------------------+
+  | Table | Create Table                                                                                |
+  +-------+---------------------------------------------------------------------------------------------+
+  | test4 | CREATE TABLE `test4` (
+    `name` varchar(5) DEFAULT NULL
+  ) ENGINE=InnoDB DEFAULT CHARSET=gbk |
+  +-------+---------------------------------------------------------------------------------------------+
+  1 row in set (0.00 sec)
+
+
+
+MySQL之字符集校对的修改以及设置
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830192939288048&vid=p1421qtt2b4
+
+
+字符集校对
+    校对规则定义了比较字符串的方式，解决排序和分组的问题。使用utf8_general_ci 不区分大小写；
+
+mysql> show table status\G
+*************************** 3. row ***************************
+           Name: test4
+         Engine: InnoDB
+        Version: 10
+     Row_format: Compact
+           Rows: 0
+ Avg_row_length: 0
+    Data_length: 16384
+Max_data_length: 0
+   Index_length: 0
+      Data_free: 0
+ Auto_increment: NULL
+    Create_time: 2018-04-23 23:22:20
+    Update_time: NULL
+     Check_time: NULL
+      Collation: gbk_chinese_ci
+       Checksum: NULL
+ Create_options: 
+        Comment:
+
+charset     Collation: gbk_chinese_ci 设置的字符集和字符集校队必须统一；
+
+
+mysql>  show character set;
++----------+-----------------------------+---------------------+--------+
+| Charset  | Description                 | Default collation   | Maxlen |
++----------+-----------------------------+---------------------+--------+
+| big5     | Big5 Traditional Chinese    | big5_chinese_ci     |      2 |
+| dec8     | DEC West European           | dec8_swedish_ci     |      1 |
+| cp850    | DOS West European           | cp850_general_ci    |      1 |
+| hp8      | HP West European            | hp8_english_ci      |      1 |
+| koi8r    | KOI8-R Relcom Russian       | koi8r_general_ci    |      1 |
+| latin1   | cp1252 West European        | latin1_swedish_ci   |      1 |
+| latin2   | ISO 8859-2 Central European | latin2_general_ci   |      1 |
+| swe7     | 7bit Swedish                | swe7_swedish_ci     |      1 |
+| ascii    | US ASCII                    | ascii_general_ci    |      1 |
+| ujis     | EUC-JP Japanese             | ujis_japanese_ci    |      3 |
+| sjis     | Shift-JIS Japanese          | sjis_japanese_ci    |      2 |
+| hebrew   | ISO 8859-8 Hebrew           | hebrew_general_ci   |      1 |
+| tis620   | TIS620 Thai                 | tis620_thai_ci      |      1 |
+| euckr    | EUC-KR Korean               | euckr_korean_ci     |      2 |
+| koi8u    | KOI8-U Ukrainian            | koi8u_general_ci    |      1 |
+| gb2312   | GB2312 Simplified Chinese   | gb2312_chinese_ci   |      2 |
+| greek    | ISO 8859-7 Greek            | greek_general_ci    |      1 |
+| cp1250   | Windows Central European    | cp1250_general_ci   |      1 |
+| gbk      | GBK Simplified Chinese      | gbk_chinese_ci      |      2 |
+| latin5   | ISO 8859-9 Turkish          | latin5_turkish_ci   |      1 |
+| armscii8 | ARMSCII-8 Armenian          | armscii8_general_ci |      1 |
+| utf8     | UTF-8 Unicode               | utf8_general_ci     |      3 |
+| ucs2     | UCS-2 Unicode               | ucs2_general_ci     |      2 |
+| cp866    | DOS Russian                 | cp866_general_ci    |      1 |
+| keybcs2  | DOS Kamenicky Czech-Slovak  | keybcs2_general_ci  |      1 |
+| macce    | Mac Central European        | macce_general_ci    |      1 |
+| macroman | Mac West European           | macroman_general_ci |      1 |
+| cp852    | DOS Central European        | cp852_general_ci    |      1 |
+| latin7   | ISO 8859-13 Baltic          | latin7_general_ci   |      1 |
+| utf8mb4  | UTF-8 Unicode               | utf8mb4_general_ci  |      4 |
+| cp1251   | Windows Cyrillic            | cp1251_general_ci   |      1 |
+| utf16    | UTF-16 Unicode              | utf16_general_ci    |      4 |
+| utf16le  | UTF-16LE Unicode            | utf16le_general_ci  |      4 |
+| cp1256   | Windows Arabic              | cp1256_general_ci   |      1 |
+| cp1257   | Windows Baltic              | cp1257_general_ci   |      1 |
+| utf32    | UTF-32 Unicode              | utf32_general_ci    |      4 |
+| binary   | Binary pseudo charset       | binary              |      1 |
+| geostd8  | GEOSTD8 Georgian            | geostd8_general_ci  |      1 |
+| cp932    | SJIS for Windows Japanese   | cp932_japanese_ci   |      2 |
+| eucjpms  | UJIS for Windows Japanese   | eucjpms_japanese_ci |      3 |
++----------+-----------------------------+---------------------+--------+
+40 rows in set (0.00 sec)
+
+MySQL之位-字节-字符的解释
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830197234255344&vid=y1421tgx3mx
+    位
+    字节
+    字符
+    utf8 3个字节
+    gbk  2个字节
+
+例子：汉字 “我” 在utf8 是3个字节 在gbk是2个字节
+
+MySQL关于int(n)中n的分析
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830201529222640&vid=y14211knjgf
+
+int(A)里面的A跟数字长度无关,没什么卵用。
+
+A不是指长度；
+int(1) 能存到 无符号 -2^31 到2^31 -1 
+
+MySQL之char(n)中n的解释
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830205824189936&vid=r142187u3rg
+
+mysql> create table char_test(name char(3));
+mysql> desc char_test;
+mysql> insert into char_test values ('1234');
+ERROR 1406 (22001): Data too long for column 'name' at row 1
+mysql> insert into char_test values ('123');
+mysql> select * from char_test;
+
+n字符的最大长度,默认为1；定长；0-255字节；最多插入255个字符；
+mysql> select length(name) from char_test;
+
+
+MySQL之varchar以及char的更深入的研究；理论 0-65535字节；
+mysql> create table varchar_test(name varchar(3));
+mysql> desc varchar_test;
+n限制了字符的最大长度；
+mysql> alter table varchar_test modify  name varchar(21845);
+ERROR 1118 (42000): Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+mysql> alter table varchar_test modify  name varchar(65535);
+ERROR 1074 (42000): Column length too big for column 'name' (max = 21845); use BLOB or TEXT instead
+
+
+MySQL之gbk和utf8存汉字的字节数sql_mode
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830214414124528&vid=z14210cj6cu
+mysql> show variables like '%sql_mode%';
++---------------+--------------------------------------------+
+| Variable_name | Value                                      |
++---------------+--------------------------------------------+
+| sql_mode      | STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION |
++---------------+--------------------------------------------+
+1 row in set (0.00 sec)
+
+set sql_mode=ANSI; 不严格模式，超出限制依然可以插入；
+
+MySQL之事务的使用以及详细分析-DTL事务控制语言
+    一个sql语句就是一个事务
+    事务可以保证一组sql语句要么都成功，要么都失败-【银行转账】
+    默认自动提交
+    可以关闭 set autocommit=0关闭自动提交
+    最后 插入或者修改时 只有commit才会存入否则不存
+
+    commit /rollback 回滚
+
+
+    create database bank;
+    use bank;
+    create table user(
+    id int unsigned not null auto_increment primary key,
+    name varchar(20) not null,
+    fee decimal(6,2) not null
+    );
+    desc user;
+    insert into user values(1,'xiaoliu',4000.00),(2,'xiaozhang',1000.00);
+    select * from user;
+  小刘给小张转2000元。
+    update user set fee=2000 where id=1;
+    update user set fee=3000 where id=2;
+
+  开启事务
+    start transaction;
+    update user set fee=2000 where id=1;
+    update user set fee=3000 where id=22;
+    rollback; 因为update user set fee=3000 where id=22;执行失败，所以进行回滚操作；
+    commit    #没有问题则commit提交
+
+  原子性：一个事务中所有的语句，要么全部成功，要么全部失败。
+  一致性：让数据保持逻辑上的合理性，能量守恒定律。
+  隔离性：如果多个事务同时并发执行，相互独立，互不影响。【多人转账相互不影响】
+  持久性：一个事务执行成功，则对数据来说应该是一个明确的硬盘数据更改(而不是仅仅内存中的变化)。
+
+默认不开启事务：  
+  show variables like '%autocommit%';
+  set autocommit=OFF;
+
+1或者ON表示开启；0或者OFF表示禁用。
+mysql> set autocommit = 0;
+Query OK, 0 rows affected (0.11 sec)
+当 autocommit = 0 时，所有的查询都在一个事务中，直到显示的执行 commit 进行提交或者 rollback 进行回滚，该事务才最终结束，同时开启了另一个事务。
+
+    MyLSAM 全文索引 不支持事务 set autocommit = 0; 不进行commit 数据依然直接写入磁盘。
+    InnoDB 支持事务 不支持全文索引 5.6版本后开始支持 5.6开始默认的数据库引擎
+
+
+数据库编程
+    存储过程函数：[封装成函数]
+    delimiter /// 修改结束符为“///”，避免函数中的分号和结束符冲突
+    create procedure test(a int)
+    begin
+    select * from shop.users where id=a;
+    end///
+
+    show procedure status \G
+    call test(1)///
+    delimiter ;
+
+    好处：
+          预编译,速度快;
+          比sql语句快很多;
+          可移植性差
+
+MySQL之视图的创建删除使用场景介绍
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830227299026416&vid=p1421m5om10
+
+创建视图--只有查看功能
+    create view test_view(users_name,users_email) as select users_name,users_email from shop.users where id=2;
+查看视图
+    show create view test_view \G;
+调用视图
+    select users_name from test_view;
+    select users_email from test_view;
+
+应用场景1,只暴露数据表一部分信息,缩小查询范围。
+应用场景2,复杂的查询语句先写好,再给普通人调用。
+
+触发器,对表进行操作之前或者之后进行触发操作
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830231593993712&vid=g1421526lz8
+use shop;
+create table article(
+id int unsigned not null auto_increment primary key,
+title varchar(20) not null
+);
+desc article;
+create table total_num(
+id int unsigned not null auto_increment primary key,
+type tinyint unsigned not null comment '1文章统计2用户统计',
+num int unsigned not null
+);
+desc total_num;
+insert into total_num values (1,1,0);
+
+增加文章创建触发器
+delimiter ///
+create trigger insert_total_num after insert on article for each row
+begin
+update total_num set num=num+1 where type=1;
+end ///
+delimiter ;
+select * from total_num;
+select * from article;
+insert into article values(1,'红叶');
+select * from article;
+#可以看到num不停加1;
+select * from total_num;  
+
+删除文章触发器
+delimiter ///
+create trigger insert_total_num after delete on article for each row
+begin
+update total_num set num=num-1 where type=1;
+end ///
+delimiter ;
+
+delete from article where id=1;

@@ -1,0 +1,161 @@
+/*
+全部字段: 出库单号、出库时间、出库仓库、出库类型、SKU、出库数量、出库备注
+  调拨单号、调拨单海外单号、调拨入库仓库
+  BBC销售单号、BBC客户
+  BB销售单号 、主体
+*/
+
+select d.id 出库单号,
+  op_time 出库时间,
+  warehouse_id 出库仓库ID,(select name from warehouses ck where ck.id 
+
+ = d.warehouse_id) 出库仓库,
+  (select value from statusdics s where s.table = 'deliveryorders' and colum_name ='type' and s.number=d.type) 出库类型,
+  sku,
+  quantity 出库数量,
+  remark 出库备注,
+  dbd_id 调拨单号,
+  oversea_delivery_sn 调拨单海外单号,
+  end_warehouse_id 调拨入库仓库ID,(select name from warehouses ck where ck.id 
+
+ = d.end_warehouse_id) 调拨入库仓库,
+  erp_orders_sn BBC销售单号,
+  sales_account BBC客户,
+  BBSN BB销售单号,
+  cn_name 主体
+from
+(
+/*
+60 调拨出库
+*/
+
+SELECT
+  ckd.id 
+
+,
+  ckd.op_time,
+  ckd.warehouse_id,
+  ckd.type,
+  ckd.sku,
+  ckd.quantity,
+  ckd.remark,
+  ckd.company_id,
+  dbd.id 
+
+ dbd_id,
+  dbd.oversea_delivery_sn,
+  dbd.end_warehouse_id,
+  ckd.erp_orders_sn,
+  '' sales_account,
+  '' BBSN
+FROM
+  deliveryorders ckd,inventory_allot_detail dbdi ,inventory_allot dbd
+WHERE
+  ckd.type=60
+  and ckd.inventory_allot_detail_id = dbdi.id 
+
+  and dbdi.inventory_allot_id = dbd.id 
+
+/*
+10 订单正常销售出库
+*/
+union all
+SELECT
+  ckd.id 
+
+,
+  ckd.op_time,
+  ckd.warehouse_id,
+  ckd.type,
+  ckd.sku,
+  ckd.quantity,
+  ckd.remark,
+  ckd.company_id,
+  '' dbd_id,
+  '' oversea_delivery_sn,
+  '' end_warehouse_id,
+  ckd.erp_orders_sn,
+  o.sales_account,
+  '' BBSN
+FROM
+  deliveryorders ckd,erp_orders o
+WHERE
+  ckd.type=10
+  and ckd.erp_orders_sn = o.erp_orders_sn
+
+/*
+160 B2B出库计划单出库
+*/
+union all
+SELECT
+  ckd.id 
+
+,
+  ckd.op_time,
+  ckd.warehouse_id,
+  ckd.type,
+  ckd.sku,
+  ckd.quantity,
+  ckd.remark,
+  ckd.company_id,
+  '' dbd_id,
+  '' oversea_delivery_sn,
+  '' end_warehouse_id,
+  ckd.erp_orders_sn,
+  '' sales_account,
+  op.order_sn BBSN
+FROM
+  deliveryorders ckd,warehouse_out_plan_order_goods opi,warehouse_out_plan_order op
+WHERE
+  ckd.type=160
+  and ckd.warehouse_out_plan_goods_id = opi.id 
+
+  and opi.warehouse_out_plan_order_id = op.id 
+
+
+/*
+20 分销商上门提货
+30 内部关联交易合同出库
+50 不良-进不良品仓
+70 其它/库位调整
+80 代发销售订单虚拟出库
+90 补做接口错误的疏漏数据
+100 冲抵录入操作错误
+110 商检出库
+120 仓库内不良品报废出库
+130 盘点盘亏出库
+140 调拨单实际到货与系统调拨单SKU差异调整出库
+150 包材出库
+
+*/
+union all
+SELECT
+  ckd.id 
+
+,
+  ckd.op_time,
+  ckd.warehouse_id,
+  ckd.type,
+  ckd.sku,
+  ckd.quantity,
+  ckd.remark,
+  ckd.company_id,
+  '' dbd_id,
+  '' oversea_delivery_sn,
+  '' end_warehouse_id,
+  ckd.erp_orders_sn,
+  '' sales_account,
+  '' BBSN
+FROM
+  deliveryorders ckd
+where ckd.type not in (10,60,160)
+) d
+LEFT JOIN warehouses wa ON wa.id 
+
+ = d.warehouse_id
+LEFT JOIN companys cs ON cs.id 
+
+ = d.company_id
+where wa.international =0
+AND d.op_time < '2017-12-02'
+  AND d.op_time >= '2017-12-01';

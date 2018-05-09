@@ -1,0 +1,25 @@
+SELECT
+v.inventory_date 年月,
+v.sku SKU,
+(
+SELECT  
+brand
+FROM
+skus
+WHERE
+sku = `v`.`sku`
+) 品牌,
+v.quantity 总数量,
+v.qualifie_quantity 良品数量,
+w. NAME 仓库,
+ca.cn_name 主体
+FROM
+inventories v
+LEFT JOIN warehouses w ON w.id = v.warehouse_id
+LEFT JOIN companys ca ON ca.id 
+
+ = v.company_id
+WHERE
+w.international = 0
+AND v.quantity != 0
+AND `inventory_date` = '2018-01-01'

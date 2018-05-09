@@ -1,0 +1,129 @@
+select
+  ckd.ckdsn 出库单号,
+  w.name 
+
+ 
+
+ 出库仓库,
+  ca.cn_name 主体,
+  FROM_UNIXTIME(ckd.create_time, '%Y-%m-%d') '日期',
+  CASE ckd.type
+  WHEN 100 THEN '转运出库'
+  WHEN 200 THEN '调拨出库'
+  WHEN 300 THEN '订单出库'
+  WHEN 400 THEN '其它出库'
+  WHEN 500 THEN '库位转移'
+  WHEN 700 THEN '采购退货'
+  WHEN 800 THEN '内部关联交易出库'
+  WHEN 1700 THEN '在途仓出库'
+  END '出库类型',
+  ckd.sku,
+  ckd.quantity '良品数',
+  ckd.defective_quentity '不良品数',
+
+  ckd.order_sn BB销售订单,
+  ckd.out_order_sn BB合同1,
+  ckd.contract_no BB合同2,
+  ckd.customer_name BB客户,
+  ckd.note 出库单备注,
+  ckd.allocation_order_sn 调拨单号,
+  (select name from be_warehouse w where w.warehouse_id = ckd.to_warehouse_id) 调拨入库仓库,
+  ckd.dbnote 调拨单备注
+
+from (
+/*
+300 订单出库
+*/
+
+select
+  ckd.warehouse_out_order_sn ckdsn,
+  ckd.warehouse_id,
+  ckd.create_time,
+  ckd.type,
+  ckdi.sku,
+  ckdi.quantity,
+  ckdi.defective_quentity,
+
+  ckdp.order_sn,
+  ckdp.out_order_sn,
+  ckdp.contract_no,
+  ckdp.customer_name,
+  (select GROUP_CONCAT(note) note from be_warehouse_out_order_note note where note.warehouse_out_order_id =ckd.warehouse_out_order_id) note,
+
+  ckd.allocation_order_sn,
+  '' to_warehouse_id,
+  '' dbnote
+
+from transfer.be_warehouse_out_order_goods ckdi,be_warehouse_out_order ckd,be_warehouse_out_plan_order ckdp
+where ckdi.warehouse_out_order_id = ckd.warehouse_out_order_id
+and ckd.warehouse_out_plan_order_sn = ckdp.warehouse_out_plan_order_sn
+and ckd.type = 300
+
+union all
+
+/*
+200 调拨出库
+*/
+
+select
+  ckd.warehouse_out_order_sn ckdsn,
+  ckd.warehouse_id,
+  ckd.create_time,
+  ckd.type,
+  ckdi.sku,
+  ckdi.quantity,
+  ckdi.defective_quentity,
+
+  '' order_sn,
+  '' out_order_sn,
+  '' contract_no,
+  '' customer_name,
+  (select GROUP_CONCAT(note) note from be_warehouse_out_order_note note where note.warehouse_out_order_id =ckd.warehouse_out_order_id) note,
+  ckd.allocation_order_sn,
+  dbd.to_warehouse_id,
+  (select GROUP_CONCAT(note) note from be_allocation_order_note note where note.allocation_order_id =dbd.allocation_order_id) dbnote
+
+from transfer.be_warehouse_out_order_goods ckdi,be_warehouse_out_order ckd,be_allocation_order dbd
+where ckdi.warehouse_out_order_id = ckd.warehouse_out_order_id
+and ckd.allocation_order_sn = dbd.allocation_order_sn
+and ckd.type = 200
+
+union all
+/*
+100 '转运出库'
+400 '其它出库'
+500 '库位转移'
+700 '采购退货'
+800 '内部关联交易出库'
+*/
+
+select
+  ckd.warehouse_out_order_sn ckdsn,
+  ckd.warehouse_id,
+  ckd.create_time,
+  ckd.type,
+  ckdi.sku,
+  ckdi.quantity,
+  ckdi.defective_quentity,
+
+  '' order_sn,
+  '' out_order_sn,
+  '' contract_no,
+  '' customer_name,
+  (select GROUP_CONCAT(note) note from be_warehouse_out_order_note note where note.warehouse_out_order_id =ckd.warehouse_out_order_id) note,
+  ckd.allocation_order_sn,
+  '' to_warehouse_id,
+  '' dbnote
+
+from transfer.be_warehouse_out_order_goods ckdi,be_warehouse_out_order ckd
+where ckdi.warehouse_out_order_id = ckd.warehouse_out_order_id
+and ckd.type not in (200,300)
+) ckd
+LEFT JOIN be_warehouse w ON w.warehouse_id = ckd.warehouse_id
+LEFT JOIN be_companys ca on ca.id 
+
+ 
+
+ = w.company_id
+where ckd.create_time>=UNIX_TIMESTAMP('2017-12-01')
+  AND ckd.create_time<UNIX_TIMESTAMP('2017-12-02')
