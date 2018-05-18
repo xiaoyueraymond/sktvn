@@ -122,5 +122,5 @@ LEFT JOIN be_companys ca on ca.id
 
  = ck.company_id
 where
-  w.rkrq>='2017-12-01'
-  and w.rkrq<'2017-12-02'
+  w.rkrq>='2018-05-10'
+  and w.rkrq<'2018-05-11'

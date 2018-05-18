@@ -1,0 +1,2 @@
+SELECT `erp_orders_sn`,`is_pay_tax`,`tax_pay_time` FROM `erp_order_pay_taxes` WHERE `erp_orders_sn` in(
+)

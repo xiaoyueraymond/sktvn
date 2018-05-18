@@ -1,0 +1,13 @@
+SELECT a.id 入库单号,a.sku SKU,C.item_count 数量,d.daifa_item_price 总价格,(d.daifa_item_price/C.item_count) 单价 FROM warehouseorders a 
+LEFT JOIN deliveryorders b ON b.id = a.deliveryorders_id 
+LEFT JOIN erp_order_products c on c.id = b.orders_products_id
+LEFT JOIN erp_order_products_daifa_detail d on d.erp_order_product_id = c.id
+WHERE a.id In(
+'158036AMGB005',
+'158037AMGB010',
+'158140JPME004',
+'158141JPME011',
+'158142YIAP015',
+'158143YIAP016',
+'158144AMHB007',
+'158145AMHB011')

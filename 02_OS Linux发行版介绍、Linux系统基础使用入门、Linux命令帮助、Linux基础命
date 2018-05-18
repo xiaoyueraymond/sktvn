@@ -1,0 +1,65 @@
+OS Linux发行版(01)_recv.mkv
+	CPU:运算器、控制器
+	程序运行模式：
+		用户模式：用户空间
+		内核模式：内核空间
+
+	可移植操作系统规范POS：
+	portable operating system
+		posix
+		api：编译接口：
+
+	运行程序格式：exe
+		dll 动态链接库 (dynamic link library)
+		linux:elf,so(shared object)
+
+	程序：指令+数据
+		指令：只读
+		数据：读写
+
+	程序：算法+数据结构
+
+	库调用：系统调用；允许被调用的程序；
+	共享库，节约资源。
+	malloc(),free()
+
+	python会自动回收内存
+	安卓--跑在虚拟机上的,会卡,内存回收机制
+	苹果机--c写的,程序员自己收垃圾
+
+	算法+数据
+	运行在虚拟机或者解释器的高级语言必然有效率损耗
+
+	编程语言：
+		汇编语言：微码编程
+			系统中某些与硬件相关的特有代码,驱动程序开发;
+		高级语言C,C++
+			系统级应用，驱动程序
+		高级应用java,python,PHP
+			应用程序
+
+kenrel glibc bash
+	
+	linux的发行版
+		slackware:
+			suse
+				sles
+				opensuse
+		debian
+			ubuntu
+				mint
+		redhat
+			rhel:redhat enterprise linux
+				每18个月发行一个新版本
+			centos 基于rhel 二次编译出来的开源,社群组织维护,后来被收编
+			fedora 【redhat 把桌面版给了fedora】--更新
+				桌面版--用了给企业版做测试
+
+gun:gpl 丧尸病毒(gplv2,gplv3) lgpl
+	apache 开源协定
+	bsd    开源协定
+
+
+
+
+

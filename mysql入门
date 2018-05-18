@@ -394,9 +394,11 @@ https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1
 
 
 
+
 【去权】
     revoke select on shop.* from 'test'@'%';
     grant all on *.* to 'zhajinhua'@'10.100.13.131';
+    grant all on *.* to 'root'@'%' identified by '123456';    
     select Select_priv from mysql.users;
     select users,host,Select_priv from mysql.users;
     无法去除，用户不存在
@@ -824,7 +826,7 @@ mysql> select * from student;
 MySQL存储引擎之各种引擎介绍修改查看引擎
 https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830175759418864&vid=m1421eajknt
 
-    MyLSAM 全文索引 不支持事务
+    MyISAM 全文索引 不支持事务
     InnoDB 支持事务 不支持全文索引 5.6版本后开始支持 5.6开始默认的数据库引擎
       CSV
       BLACKHOLE
@@ -843,10 +845,10 @@ mysql> show table status\G;
 
 MySQL存储引擎之MyISAM和InnoDB的区别
 https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830180054386160&vid=s1421e1ho8i
-    MYlSAM 全文索引full text 不支持事务
+    MyISAM 全文索引full text 不支持事务
         表级锁
         奔溃恢复支持不好
-        数量小，MYlSAM速度快
+        数量小，MyISAM速度快
 
     InnoDB 支持事务 不支持全文索引
         行级锁
@@ -1090,7 +1092,7 @@ mysql> set autocommit = 0;
 Query OK, 0 rows affected (0.11 sec)
 当 autocommit = 0 时，所有的查询都在一个事务中，直到显示的执行 commit 进行提交或者 rollback 进行回滚，该事务才最终结束，同时开启了另一个事务。
 
-    MyLSAM 全文索引 不支持事务 set autocommit = 0; 不进行commit 数据依然直接写入磁盘。
+    MyISAM 全文索引 不支持事务 set autocommit = 0; 不进行commit 数据依然直接写入磁盘。
     InnoDB 支持事务 不支持全文索引 5.6版本后开始支持 5.6开始默认的数据库引擎
 
 
@@ -1164,3 +1166,246 @@ end ///
 delimiter ;
 
 delete from article where id=1;
+
+查看触发器
+show create trigger delete_total_num;
+drop trigger delete_total_num;
+
+MySLQ之navicate的使用
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830235888961008&vid=w1421t0a8y1
+
+MySQL数navicate和mysqldump导入和导出区别
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830240183928304&vid=d1421dyv0t0
+
+数据库备份 mysqldump -u root  shop users >/tmp/1.sql
+速度 mysqldump 速度比 navicat 快得多；
+
+二、导入数据库
+1、首先建空数据库
+mysql>create database abc;
+
+2、导入数据库
+方法一：
+（1）选择数据库
+mysql>use abc;
+（2）设置数据库编码
+mysql>set names utf8;
+（3）导入数据（注意sql文件的路径）
+mysql>source /home/abc/abc.sql;
+方法二：
+mysql -u用户名 -p密码 数据库名 < 数据库名.sql
+#mysql -uabc_f -p abc < abc.sql
+
+MySQL之（普通主键唯一）索引的创建
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830244478895600&vid=s14216mjsap
+
+添加索引,加快查询速度;
+    普通索引：key/index
+    唯一索引：unique key 设置的字段,插入值不可重复
+    主键索引：primary key 主key不可重复，必备字段，计数的效果
+    全文索引：只支持MYISAM，解决模糊查询太慢的问题
+    alter table users engine=myisam;
+    组合索引：
+    外检约束：
+
+create table user(
+id int unsigned not null auto_increment,
+user_name varchar(20) not null,
+password varchar(32) not null,
+email varchar(32) not null,
+age tinyint unsigned not null,
+primary key(id),
+unique(user_name),
+key(age),
+index(email)
+);
+
+mysql> desc user;
++-----------+---------------------+------+-----+---------+----------------+
+| Field     | Type                | Null | Key | Default | Extra          |
++-----------+---------------------+------+-----+---------+----------------+
+| id        | int(10) unsigned    | NO   | PRI | NULL    | auto_increment |
+| user_name | varchar(20)         | NO   | UNI | NULL    |                |
+| password  | varchar(32)         | NO   |     | NULL    |                |
+| email     | varchar(32)         | NO   | MUL | NULL    |                |
+| age       | tinyint(3) unsigned | NO   | MUL | NULL    |                |
++-----------+---------------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+show index from user \G 查看索引
+
+MySQL之外键约束的创建以及使用
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830253068830192&vid=x1421r85j50
+
+表1
+id 学生名称
+表2
+id st_id 成绩
+表1.id 外键表2.st_id，不可以插入学生不存在的成绩。
+
+MySQL优化之开启慢查询日志记录慢的语句
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830257363797488&vid=j1421ng8ved
+数据量超过百万，SQL语句效率会反应出来。
+
+记录比较慢的查询
+show variables like '%slow%';
+show variables like '%long%';
+
+mysql> show variables like '%long%';
+#默认大于10秒的为慢查询
++--------------------------------------------------------+-----------+
+| Variable_name                                          | Value     |
++--------------------------------------------------------+-----------+
+| long_query_time                                        | 10.000000 |
+| performance_schema_events_stages_history_long_size     | 100       |
+| performance_schema_events_statements_history_long_size | 100       |
+| performance_schema_events_waits_history_long_size      | 100       |
++--------------------------------------------------------+-----------+
+4 rows in set (0.00 sec)
+
+mysql> 
+
+开启慢记录
+set global slow_query_log=ON;
+[root@localhost ~]# ll /data/data/localhost-slow.log 
+-rw-rw---- 1 mysql mysql 183 Apr 25 03:45 /data/data/localhost-slow.log
+
+找出语句慢的
+tail -f /data/data/localhost-slow.log 
+
+explain 慢语句
+explain select * from account where account_id=235645\G
+
+mysql> explain select * from users\G
+*************************** 1. row ***************************
+           id: 1
+  select_type: SIMPLE
+        table: users
+         type: ALL
+possible_keys: NULL
+          key: NULL  索引
+      key_len: NULL
+          ref: NULL
+         rows: 4     遍历的行数
+        Extra: NULL
+1 row in set (0.00 sec)
+
+#性能
+show variables like 'profiling';
+
+
+mysql> show profiles;
++----------+------------+---------------------------------+
+| Query_ID | Duration   | Query                           |
++----------+------------+---------------------------------+
+|        1 | 0.00038325 | show variables like 'profiling' |
+|        2 | 0.00017250 | select * from users             |
+|        3 | 0.00040250 | show variables like 'profiling' |
++----------+------------+---------------------------------+
+3 rows in set, 1 warning (0.00 sec)
+
+mysql> show profile for query 2;
++----------------------+----------+
+| Status               | Duration |
++----------------------+----------+
+| starting             | 0.000031 |
+| checking permissions | 0.000004 |
+| Opening tables       | 0.000012 |
+| init                 | 0.000016 |
+| System lock          | 0.000005 |
+| optimizing           | 0.000003 |
+| statistics           | 0.000010 |
+| preparing            | 0.000008 |
+| executing            | 0.000001 |
+| Sending data         | 0.000051 |
+| end                  | 0.000003 |
+| query end            | 0.000004 |
+| closing tables       | 0.000006 |
+| freeing items        | 0.000007 |
+| cleaning up          | 0.000012 |
++----------------------+----------+
+15 rows in set, 1 warning (0.00 sec)
+
+分析的时候才开,不分析就不开。会小号性能
+
+给where 后面的语句加索引
+
+MySQL优化之数据库缓存关闭
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830270248699376&vid=z1421q8fhwz
+
+mysql> show variables like '%cache%';
+ERROR 2006 (HY000): MySQL server has gone away
+No connection. Trying to reconnect...
+Connection id:    43
+Current database: shop
+
++--------------------------------+----------------------+
+| Variable_name                  | Value                |
++--------------------------------+----------------------+
+| binlog_cache_size              | 32768                |
+| binlog_stmt_cache_size         | 32768                |
+| have_query_cache               | YES                  |
+| host_cache_size                | 279                  |
+| innodb_disable_sort_file_cache | OFF                  |
+| innodb_ft_cache_size           | 8000000              |
+| key_cache_age_threshold        | 300                  |
+| key_cache_block_size           | 1024                 |
+| key_cache_division_limit       | 100                  |
+| max_binlog_cache_size          | 18446744073709547520 |
+| max_binlog_stmt_cache_size     | 18446744073709547520 |
+| metadata_locks_cache_size      | 1024                 |
+| query_cache_limit              | 1048576              |
+| query_cache_min_res_unit       | 4096                 |
+| query_cache_size               | 1048576              |
+| query_cache_type               | OFF --测试要把这个整成OFF，不然无法测试真是查询速度
+| query_cache_wlock_invalidate   | OFF                  |
+| stored_program_cache           | 256                  |
+| table_definition_cache         | 1400                 |
+| table_open_cache               | 2000                 |
+| table_open_cache_instances     | 1                    |
+| thread_cache_size              | 9                    |
++--------------------------------+----------------------+
+22 rows in set (0.00 sec)
+
+缓存命中率
+
+mysql> show status like '%qcache%';
++-------------------------+---------+
+| Variable_name           | Value   |
++-------------------------+---------+
+| Qcache_free_blocks      | 1       |
+| Qcache_free_memory      | 1031376 |
+| Qcache_hits             | 0       |
+| Qcache_inserts          | 0       |
+| Qcache_lowmem_prunes    | 0       |
+| Qcache_not_cached       | 75      |
+| Qcache_queries_in_cache | 0       |
+| Qcache_total_blocks     | 1       |
++-------------------------+---------+
+8 rows in set (0.00 sec)
+
+waiting for query cache lock 等待缓存响应的时间
+explain select * from account where pid='240691' or password='limeiling123' \G
+需要把where后面的所有字段都加索引;
+需要什么字段的值，就找什么样的值，尽量不要用select *;
+不要在字段里面做运算;
+大于等于小于不等于都要尽量避免;
+走like的时候 右模糊 不走索引,也会比较慢；
+
+MySQL之配置的临时修改以及永久修改方法
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830278838633968&vid=t14211x4c8r
+直接把show variables like '%cache%';
+修改配置文件
+[mysqld]
+query_cache_size=1024000
+重启就永久修改了
+
+MySQL之数据表三范式的设计以及后续
+https://ke.qq.com/webcourse/index.html#course_id=280048&term_id=100331692&taid=1830283133601264&vid=t1421yei160
+第一范式
+    既表的列具有原子性,不可再分解,只要是关系型数据库，就自动满足；
+第二范式
+    满足范式一，行或者列被唯一区分，用主键来实现。
+第三范式
+    要求一个数据库表中不包含已在其他表中的非主键字段
+    （能用外键join就用外键join）

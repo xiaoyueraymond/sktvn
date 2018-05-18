@@ -50,4 +50,26 @@
 
 01_OS及Linux基础知识(02)_recv.mkv
 	CPU:运算器、控制器
+	程序运行模式：
+		用户模式：用户空间
+		内核模式：内核空间
+
+	可移植操作系统规范POS：
+	portable operating system
+		posix
+		api：编译接口：
+
+	运行程序格式：exe
+		dll 动态链接库 (dynamic link library)
+		linux:elf,so(shared object)
+
+	程序：指令+数据
+		指令：只读
+		数据：读写
+
+	程序：算法+数据结构
+
+	库调用：系统调用；允许被调用的程序；
+
+
 	

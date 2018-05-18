@@ -94,6 +94,8 @@ https://ke.qq.com/webcourse/index.html#course_id=193770&term_id=100229617&taid=1
 	AddDefaultCharset gb2312
 	AddDefaultCharset UTF-8
 	Options Indexes FollowSymLinks
+	IndexOptions Charset=UTF-8
+
 
 	Indexes 的作用就是当该目录下没有 index.html 文件时，就显示目录结构
 	mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak

@@ -1,0 +1,4 @@
+python flask
+pip install flask
+
+netstat -ano|findstr "5000"

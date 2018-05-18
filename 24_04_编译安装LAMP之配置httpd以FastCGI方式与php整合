@@ -90,7 +90,7 @@ php
 	make install
 -----------------------------------------------------------
     cd /usr/local/mysql/
-	chmod -R 770 /usr/local/mysql/scripts/
+	chmod -R 777 /usr/local/mysql/scripts/
 	scripts/mysql_install_db --user=mysql --datadir=/data/data
 
 

@@ -162,5 +162,5 @@ LEFT JOIN companys cs on cs.id
 
  = w.company_id
 where wa.international =0
-AND w.op_time < '2017-12-02'
-  AND w.op_time >= '2017-12-01'
+AND w.op_time < '2018-05-15'
+  AND w.op_time >= '2018-05-14'

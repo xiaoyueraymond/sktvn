@@ -1,0 +1,94 @@
+##Options Indexes FollowSymLinks，Indexes 的作用就是当该目录下没有 index.html 文件时，就显示目录结构
+如何显示目录 https://www.linuxidc.com/Linux/2014-11/109957.htm
+
+【配置apahce】
+yum install httpd -y
+chkconfig httpd on
+
+vi /etc/httpd/conf/httpd.conf
+ServerName localhost:80
+<Directory />
+Options FollowSymLinks
+AllowOverride None
+Order deny,allow
+allow from all
+</Directory>
+AddDefaultCharset gb2312
+AddDefaultCharset UTF-8
+mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
+
+service httpd restart
+
+yum install -y lrzsz
+cd /var/www/html/
+上传execl文件
+mkdir -p /usr/local/python
+cd /usr/local/python
+上传python文件
+#https://blog.csdn.net/feiniao8651/article/details/71467537
+#Linux下python2.7安装pip
+sudo yum install MySQL-python -y
+yum install -y wget
+
+#安装pip
+wget --no-check-certificate https://bootstrap.pypa.io/ez_setup.py
+sudo python ez_setup.py --insecure
+wget https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#md5=35f01da33009719497f01a4ba69d63c9 
+tar -zxvf pip-9.0.1.tar.gz 
+cd /usr/local/python/pip-9.0.1
+python setup.py install 
+pip install pandas
+
+#python 2.6 升级 2.7
+#https://blog.csdn.net/tengdazhang770960436/article/details/77991900
+cd /usr/local/python/
+wget http://python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2 
+tar -jxvf Python-2.7.3.tar.bz2 
+cd /usr/local/python/Python-2.7.3
+./configure  
+make all 
+make install
+/usr/local/bin/python2.7 -V  
+mv /usr/bin/python /usr/bin/python2.6.6  
+ln -s /usr/local/bin/python2.7 /usr/bin/python
+ 
+#python升级导致yum命令无法使用的解决办法（修改版）
+#https://blog.csdn.net/ei__nino/article/details/8495295
+vi /usr/bin/yum 
+#!/usr/bin/python
+改为旧版本:
+#!/usr/bin/python2.6 
+
+#CentOS7使用pip安装mysql-python出错解决方案
+https://my.oschina.net/liuyuantao/blog/746541
+yum install mysql-devel
+pip install mysql-python 
+sudo yum -y install gcc gcc-c++ kernel-devel
+sudo yum -y install python-devel libxslt-devel libffi-devel openssl-devel
+pip install pandas -i https://pypi.tuna.tsinghua.edu.cn/simple 非常慢半小时
+
+yum install -y dos2unix
+crontab -e
+0 8 * * * python /usr/local/python/python_mysql_csv_linux.py
+crontab -l
+
+【安装php】
+#
+  232  yum list installed | grep php  
+  233  rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+  234  rpm -Uvh http://ftp.iij.ad.jp/pub/linux/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm
+  235  yum install --enablerepo=remi --enablerepo=remi-php56 php php-opcache php-devel php-mbstring php-mcrypt php-mysqlnd php-phpunit-PHPUnit php-pecl-xdebug php-pecl-xhprof
+  236  yum install --enablerepo=remi --enablerepo=remi-php56 php-fpm  
+  237  service php-fpm start
+  238  chkconfig --add php-fpm
+  239  chkconfig php-fpm on
+  240  vi /var/www/html/index.php
+  241  cd /var/www/html/
+  242  ll
+  243  service apache restart
+  244  service httpd restart
+  245  histroy
+  246  history
+
+【改pyhton路径】
+/var/www/html/download/

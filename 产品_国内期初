@@ -22,4 +22,4 @@ LEFT JOIN companys ca ON ca.id
 WHERE
 w.international = 0
 AND v.quantity != 0
-AND `inventory_date` = '2018-01-01'
+AND `inventory_date` = '2018-04-01'
