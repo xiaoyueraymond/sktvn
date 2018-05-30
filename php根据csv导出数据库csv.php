@@ -37,7 +37,7 @@ if($_FILES){
 	$str = join(",",$list);
 	$ids = "'".str_replace(",","','",$str)."'";
 
-	$mysqli = mysqli_connect('rm-j6ch7qp1xe6f4z02kgo.mysql.rds.aliyuncs.com', 'wanghao', '0Y6o5WBaF0EAMUt5', 'newerp');
+	$mysqli = mysqli_connect('数据库地址', '用户名', '密码', '数据库');
 	$sql = "SELECT a.id ,a.sku ,c.item_count ,d.daifa_item_price ,(d.daifa_item_price/C.item_count) 单价 FROM warehouseorders a 
 			LEFT JOIN deliveryorders b ON b.id = a.deliveryorders_id 
 			LEFT JOIN erp_order_products c ON c.id = b.orders_products_id
@@ -49,7 +49,7 @@ if($_FILES){
 	die('没有数据');
 
 	$rows = array();
-	while($row = mysqli_fetch_row($res)) {
+	while($row = mysqli_fetch_assoc($res)) {
 		$row['price'] = $row['daifa_item_price'] / $row['item_count'];
 		$rows[] = $row;
 	}
