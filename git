@@ -74,6 +74,7 @@ git push https://gitee.com/xyrlandcom/demo.git master
 
 git push https://gitee.com/xyrlandcom/txt.git master
 git pull https://gitee.com/xyrlandcom/txt.git master
+git pull https://github.com/xiaoyueraymond/sktvn.git master
 #从服务器拉回代码
 cd d:/git/
 git pull https://gitee.com/xyrlandcom/demo.git master
