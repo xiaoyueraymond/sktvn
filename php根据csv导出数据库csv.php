@@ -37,7 +37,7 @@ if($_FILES){
 	$str = join(",",$list);
 	$ids = "'".str_replace(",","','",$str)."'";
 
-	$mysqli = mysqli_connect('j6ch7qp1xe6f4z02kgo.mysql.rds.aliyuncs.com', 'finance_java', '7b@0cB8D5929D5d', 'newerp');
+	$mysqli = mysqli_connect('', '', '', '');
 	$sql = "SELECT a.id ,a.sku ,c.item_count ,d.daifa_item_price ,(d.daifa_item_price/C.item_count) 单价 FROM warehouseorders a 
 			LEFT JOIN deliveryorders b ON b.id = a.deliveryorders_id 
 			LEFT JOIN erp_order_products c ON c.id = b.orders_products_id
