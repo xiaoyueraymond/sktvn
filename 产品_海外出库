@@ -125,5 +125,5 @@ LEFT JOIN be_companys ca on ca.id
  
 
  = w.company_id
-where ckd.create_time>=UNIX_TIMESTAMP('2018-05-13')
-  AND ckd.create_time<UNIX_TIMESTAMP('2018-05-14')
+where ckd.create_time>=UNIX_TIMESTAMP('2018-09-01')
+  AND ckd.create_time<UNIX_TIMESTAMP('2018-10-01')

@@ -1,3 +1,4 @@
+centos6.8 centos6.9
 ##Options Indexes FollowSymLinks，Indexes 的作用就是当该目录下没有 index.html 文件时，就显示目录结构
 如何显示目录 https://www.linuxidc.com/Linux/2014-11/109957.htm
 
@@ -8,6 +9,7 @@ chkconfig httpd on
 vi /etc/httpd/conf/httpd.conf
 ServerName localhost:80
 <Directory />
+DirectoryIndex index.html index.htm index.php index.php3
 Options FollowSymLinks
 AllowOverride None
 Order deny,allow
@@ -31,6 +33,7 @@ sudo yum install MySQL-python -y
 yum install -y wget
 
 #安装pip
+cd /usr/local/python
 wget --no-check-certificate https://bootstrap.pypa.io/ez_setup.py
 sudo python ez_setup.py --insecure
 wget https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#md5=35f01da33009719497f01a4ba69d63c9 
@@ -45,6 +48,7 @@ cd /usr/local/python/
 wget http://python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2 
 tar -jxvf Python-2.7.3.tar.bz2 
 cd /usr/local/python/Python-2.7.3
+yum install gcc -y
 ./configure  
 make all 
 make install
@@ -61,8 +65,8 @@ vi /usr/bin/yum
 
 #CentOS7使用pip安装mysql-python出错解决方案
 https://my.oschina.net/liuyuantao/blog/746541
-yum install mysql-devel
-pip install mysql-python 
+yum install mysql-devel -y
+pip install mysql-python -y
 sudo yum -y install gcc gcc-c++ kernel-devel
 sudo yum -y install python-devel libxslt-devel libffi-devel openssl-devel
 pip install pandas -i https://pypi.tuna.tsinghua.edu.cn/simple 非常慢半小时
@@ -74,21 +78,43 @@ crontab -l
 
 【安装php】
 #
-  232  yum list installed | grep php  
-  233  rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
-  234  rpm -Uvh http://ftp.iij.ad.jp/pub/linux/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm
-  235  yum install --enablerepo=remi --enablerepo=remi-php56 php php-opcache php-devel php-mbstring php-mcrypt php-mysqlnd php-phpunit-PHPUnit php-pecl-xdebug php-pecl-xhprof
-  236  yum install --enablerepo=remi --enablerepo=remi-php56 php-fpm  
-  237  service php-fpm start
-  238  chkconfig --add php-fpm
-  239  chkconfig php-fpm on
-  240  vi /var/www/html/index.php
-  241  cd /var/www/html/
-  242  ll
-  243  service apache restart
-  244  service httpd restart
-  245  histroy
-  246  history
+yum -y install net-tools 
+yum list installed | grep php  
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+rpm -Uvh http://ftp.iij.ad.jp/pub/linux/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm
+yum install --enablerepo=remi --enablerepo=remi-php56 php php-opcache php-devel php-mbstring php-mcrypt php-mysqlnd php-phpunit-PHPUnit php-pecl-xdebug php-pecl-xhprof -y
+yum install --enablerepo=remi --enablerepo=remi-php56 php-fpm  -y
+service php-fpm start
+chkconfig --add php-fpm
+chkconfig php-fpm on
+vi /var/www/html/index.php
+cd /var/www/html/
+ll
+service httpd restart
+service php-fpm restart
+
 
 【改pyhton路径】
-/var/www/html/download/
+mkdir /var/www/html/download/
+
+
+【钉钉talk】
+cd /usr/local/python/
+dos2unix python_dingding_linux.py
+pip install requests
+yum install -y libffi libffi-devel
+https://github.com/zhuifengshen/DingtalkChatbot
+
+unzip DingtalkChatbot-master.zip
+cd DingtalkChatbot-master
+python setup.py install
+crontab -e
+0 18 * * 1-5 python /usr/local/python/python_dingding_linux.py
+
+
+http://blog.51cto.com/wangyongbin/1705385
+  
+AttributeError: 'NoneType' object has no attribute 'decompressobj'
+
+date -s "2018-10-20 11:11:11"
+

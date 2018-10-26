@@ -1,0 +1,34 @@
+SELECT 
+b.xingyun_order_no  代发单号,
+c.xingyun_order_no  代发单号,
+c.erp_orders_sn 内单号,
+b.sku_name 产品名字,
+c.transportion 物流单号,
+c.payment_info_id_card_number 身份证号,
+c.payment_info_name 姓名,
+c.buyer_phone 手机号码,
+b.orders_sku SKU,
+dealer 代发商,
+allocate_warehouse_sku.d_goods 代发商SKU,
+b.final_fee 总价,
+b.item_count 数量
+FROM erp_order_products b                                                                  
+LEFT JOIN erp_order_products_daifa_detail a ON a.erp_order_product_id=b.id
+LEFT JOIN erp_orders c ON c.erp_orders_sn=b.erp_orders_sn
+LEFT JOIN warehouses d ON d.id=c.warehouse_id
+LEFT JOIN allocate_warehouse_sku ON b.orders_sku=allocate_warehouse_sku.ht_sku
+WHERE `dealer` = '杭州唯妮'
+AND c.erp_orders_sn in(
+'80721781049',
+'80698222456',
+'80698630266',
+'80692676089',
+'80704369790',
+'80695380379',
+'80711960660',
+'80684740511',
+'80658264060',
+'80662913521',
+'80667773622',
+'80634776920',
+'81109339431')

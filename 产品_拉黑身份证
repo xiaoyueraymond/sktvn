@@ -1,0 +1,2 @@
+SELECT `erp_orders_sn`,`payment_info_id_card_number`,`payment_info_name` FROM `erp_orders` WHERE `erp_orders_sn` in(
+'1836471493071001')

@@ -1,0 +1,8 @@
+
+
+SELECT * from member_workhours WHERE project_members_id in (SELECT id from project_members WHERE project_id = 130);
+SELECT * from project_members WHERE project_id = 130;
+SELECT * from member_evaluation WHERE project_id = 130;
+SELECT * from project WHERE id = 130;
+
+

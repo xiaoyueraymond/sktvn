@@ -157,5 +157,5 @@ LEFT JOIN companys cs ON cs.id
 
  = d.company_id
 where wa.international =0
-AND d.op_time < '2018-05-11'
-  AND d.op_time >= '2018-05-10';
+AND d.op_time < '2017-08-01'
+  AND d.op_time >= '2017-07-01';

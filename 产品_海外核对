@@ -1,0 +1,40 @@
+-- V2.0 
+SELECT 
+    ckid,sku,
+    SUM(qcsl) 期初数量,    SUM(rksl) 入库数量,    SUM(cksl)*-1 出库数量,    SUM(qmsl) 期末数量,SUM(PDSL) 盘点数量,
+    SUM(qcsl) + SUM(rksl) - SUM(cksl) - SUM(qmsl) + SUM(PDSL) 差异
+FROM(
+-- 期末
+SELECT  date_sub(i.date,interval 1 day) date,i.warehouse_id ckid,i.sku,SUM(i.quantity_nondefective + i.quantity_defective) qmsl, 0 rksl, 0 cksl, 0 qcsl,0 pdsl
+FROM transfer.be_beginning_inventory_summary i
+GROUP BY i.date,i.warehouse_id,i.sku
+UNION ALL
+-- 出库
+SELECT from_unixtime(o.create_time,'%Y-%m-%d') date,
+    o.warehouse_id CKID,g.sku,0 qmsl, 0 rksl, SUM(g.quantity + g.defective_quentity) cksl, 0 qcsl,0 pdsl
+FROM transfer.be_warehouse_out_order_goods g
+LEFT JOIN be_warehouse_out_order o ON g.`warehouse_out_order_id`=o.`warehouse_out_order_id`
+GROUP BY from_unixtime(o.create_time,'%Y-%m-%d'),o.warehouse_id,g.sku
+UNION ALL
+-- 盘点
+SELECT from_unixtime(o.create_time,'%Y-%m-%d') date,
+    o.warehouse_id ckid,
+    g.sku, 0 qmsl, 0 rksl, 0 cksl, 0 qcsl,SUM(g.quantity_offset + g.defective_quantity_offset) pdsl
+FROM transfer.be_stock_taking_order_goods g
+LEFT JOIN transfer.be_stock_taking_order o ON g.`stock_taking_order_id`=o.`stock_taking_order_id`
+GROUP BY from_unixtime(o.create_time,'%Y-%m-%d'),o.warehouse_id,g.sku
+UNION ALL
+-- 入库
+SELECT from_unixtime(o.create_time,'%Y-%m-%d') date,
+    o.warehouse_id ckid,g.sku, 0 qmsl, SUM(g.quantity + g.defective_quentity) rksl, 0 cksl, 0 qcsl,0 pdsl
+FROM transfer.be_warehouse_entry_order_goods g
+LEFT JOIN transfer.be_warehouse_entry_order o ON g.`warehouse_entry_order_id`=o.`warehouse_entry_order_id` 
+GROUP BY from_unixtime(o.create_time,'%Y-%m-%d'),o.warehouse_id,g.sku
+UNION ALL
+-- 期初
+SELECT  i.date,i.warehouse_id ckid,i.sku,0 qmsl, 0 rksl, 0 cksl, SUM(i.quantity_nondefective + i.quantity_defective) qcsl,0 pdsl
+FROM transfer.be_beginning_inventory_summary i
+GROUP BY i.date,i.warehouse_id,i.sku) A
+WHERE A.DATE >='2018-09-01' AND A.DATE <'2018-10-01'
+GROUP BY ckid,sku
+#HAVING SUM(qcsl) + SUM(rksl) - SUM(cksl) - SUM(qmsl) + SUM(PDSL) <> 0

@@ -13,7 +13,7 @@ LEFT JOIN be_companys ca ON ca.id
 
  = b.company_id
 WHERE
-	date = '2018-05-01'
+	date = '2018-09-01'
 AND quantity <> 0
 GROUP BY
 	a.warehouse_id,

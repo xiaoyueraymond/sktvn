@@ -1,0 +1,44 @@
+10.100.13.188
+https://blog.csdn.net/gmzpx/article/details/80137714
+
+node.noobxmr.com
+https://youtu.be/W-jCNZYOch0
+
+
+
+ls -l |grep "^-"|wc -l
+
+sudo apt-get update
+sudo apt-get install lrzsz
+sudo apt install git build-essential cmake libuv1-dev uuid-dev libmicrohttpd-dev
+git clone https://github.com/xmrig/xmrig-proxy.git
+cd xmrig-proxy/
+vi src/donate.h 
+constexpr const int kDefaultDonateLevel = 0;
+cmake .
+make
+cp src/config.json .
+apt install screen
+screen
+sudo /etc/init.d/apache2 start
+
+
+sudo su root
+
+vi tmp/monitor.sh
+#! /bin/sh
+name="xmrig-proxy"        #进程名 
+proc_num()                      #查询进程数量
+{   
+    num=`ps -ef | grep $proc_name | grep -v grep | wc -l`
+    return $num
+}
+
+proc_num
+number=$?                       #获取进程数量
+if [ $number -eq 0 ]            #如果进程数量为0
+then                            #重新启动服务器，或者扩展其它内容。
+    cd /home/adminadmin/xmrig-proxy; ./xmrig-proxy
+fi  
+
+*/1 * * * * sh /tmp/monitor.sh

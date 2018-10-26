@@ -8,9 +8,7 @@ select
   w.id 入库单号,
   op_time 入库时间,
   warehouse_id 入库仓库ID,
-  (select name from warehouses ck where ck.id 
-
- = w.warehouse_id) 入库仓库,
+  (select name from warehouses ck where ck.id = w.warehouse_id) 入库仓库,
   (select brand from skus where sku =w.`sku`) 品牌,
   sku,warehouse_quantity 入库数量,
   (select value from statusdics s where s.table = 'warehouseorders' and colum_name ='type' and s.number=w.type) 入库类型,
@@ -26,20 +24,15 @@ select
   dbd_id 调拨单号,
   dbd_oversea_delivery_sn 海外仓调拨单号,
   dbd_begin_warehouse_id 调拨出库仓库ID,
-  (select name from warehouses ck where ck.id 
-
- = w.dbd_begin_warehouse_id) 调拨单出库仓库,
+  (select name from warehouses ck where ck.id = w.dbd_begin_warehouse_id) 调拨单出库仓库,
   cn_name 主体
 from
 (
 /*
 *90 退货（实际退货）
 */
-
 SELECT
-  rkd.id 
-
- ,
+  rkd.id ,
   rkd.op_time ,
   rkd.warehouse_id,
   rkd.sku,
@@ -57,26 +50,17 @@ SELECT
   '' dbd_oversea_delivery_sn,
   '' dbd_begin_warehouse_id
 from warehouseorders rkd
-LEFT JOIN erp_order_products_return pr on pr.id 
-
- = rkd.erp_orders_return_id
-LEFT JOIN erp_orders_return re on re.id 
-
- = pr.erp_orders_return_id
+LEFT JOIN erp_order_products_return pr on pr.id = rkd.erp_orders_return_id
+LEFT JOIN erp_orders_return re on re.id = pr.erp_orders_return_id
 where rkd.type = 90
--- and re.id 
-
- = 4885
+-- and re.id = 4885
 union all
-
 /*
 *60 调拨入库
 *
 */
 SELECT
-  rkd.id 
-
- ,
+  rkd.id ,
   rkd.op_time ,
   rkd.warehouse_id,
   rkd.sku,
@@ -90,25 +74,15 @@ SELECT
   '' price,
   '' BBC_account,
   '' BBC_order,
-  dbd.id 
-
- dbd_id,
+dbd.id dbd_id,
   dbd.oversea_delivery_sn dbd_oversea_delivery_sn,
   dbd.begin_warehouse_id dbd_begin_warehouse_id
-
-from warehouseorders rkd,
-  inventory_allot_detail dbdi,
-  inventory_allot dbd
+from warehouseorders rkd
+LEFT JOIN inventory_allot_detail dbdi ON dbdi.id = rkd.inventory_allot_detail_id
+LEFT JOIN inventory_allot dbd ON dbd.id  = dbdi.inventory_allot_id
 where
-  dbd.id 
-
- = dbdi.inventory_allot_id
-  and dbdi.id 
-
- = rkd.inventory_allot_detail_id
-  and rkd.type = 60
+ rkd.type = 60
 union all
-
 /*
 10 正常采购入库
 20 已生成出库单未发货订单取消拦截补回入库单【原称:退货(取消订单)】
@@ -126,9 +100,7 @@ union all
 
 */
 SELECT
-  rkd.id 
-
- ,
+  rkd.id ,
   rkd.op_time ,
   rkd.warehouse_id,
   rkd.sku,
@@ -155,12 +127,8 @@ FROM
   coin ON `coin`.`coin_id` = `purchaseorder_details`.`currency`
 WHERE rkd.type not in (60,90)
 ) w
-LEFT JOIN warehouses wa ON wa.id 
-
- = w.warehouse_id
-LEFT JOIN companys cs on cs.id 
-
- = w.company_id
+LEFT JOIN warehouses wa ON wa.id = w.warehouse_id
+LEFT JOIN companys cs on cs.id = w.company_id
 where wa.international =0
-AND w.op_time < '2018-05-15'
-  AND w.op_time >= '2018-05-14'
+AND w.op_time < '2018-10-22'
+AND w.op_time >= '2018-10-21'

@@ -1,0 +1,23 @@
+#期初#期末
+SELECT * FROM `inventories` WHERE `inventory_date` = '2018-07-01'  AND `sku` IN (
+'AMSO014',
+'CANU003',
+'CANU004',
+'FE_DKAR021')
+
+#入库
+SELECT * FROM `warehouseorders_details` WHERE  `warehouse_time` BETWEEN '2018-06-01 00:00:00.000000' AND '2018-07-01 00:00:00.000000' AND `sku` IN(
+
+'DKAR021',
+'FE_DKAR021')
+
+#出库
+
+SELECT * FROM `deliveryorders_details` WHERE  `delivery_time` BETWEEN '2018-06-01 00:00:00.000000' AND '2018-07-01 00:00:00.000000' AND `sku` IN(
+'AMSO014',
+'CANU003',
+'CANU004',
+'FE_DKAR021')
+
+
+

@@ -1,31 +1,4 @@
-	
-i-bp1b50x7s0n2a6r8lqci
-
-gitlab-主
- 
-华东 1 可用区 E	
-116.62.41.23(公)
-
-10.27.97.176(内)
-
-运行中	
-经典网络
-
-4 vCPU 8 GB (I/O优化)
-
-ecs.n1.large   5Mbps
-
-ecs.n1.large
-
-共享计算型
-
-
-
-包年包月
-
-18-12-25 00:00 到期
-
-手动续费
-
-管理 | 远程连接 | 升降配
-续费 | 更多
+```'''8月1日前代发订单 系统对接未上线，代发订单不过系统，第二次修复，可能会有遗漏，需要多次修复
+'''
+UPDATE `warehouseorders` SET single_price='99.03',tax_singe_price='99.03',money='198.06',cost='198.06' WHERE id='254912' AND sku='JPME028' AND warehouse_id='460';
+```

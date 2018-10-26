@@ -1,0 +1,1 @@
+SELECT  transportion_sn 物流单号,event 物流轨迹,update_time 录入时间 from transportion_nodes WHERE transportion_sn in()

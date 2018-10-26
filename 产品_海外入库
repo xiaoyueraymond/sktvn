@@ -8,8 +8,6 @@ select
   rkrq 入库时间,
   w.warehouse_id 入库仓库,ck.name 
 
- 
-
  入库仓库,
 ca.cn_name 主体,
   w.type 入库类型ID,
@@ -25,11 +23,7 @@ ca.cn_name 主体,
   quantity 良品数量,
   defective_quentity 不良品数量,
   note 备注,
-  seller_company_id 内部交易卖方主体ID,(select cn_name from be_companys com where com.id 
-
- 
-
- = w.seller_company_id) 内部交易卖方主体,
+  seller_company_id 内部交易卖方主体ID,(select cn_name from be_companys com where com.id = w.seller_company_id) 内部交易卖方主体,
   purchase_order_id 采购单号,
   supplier_id 供应商ID,(select name from be_supplier where supplier_id = w.supplier_id) 供应商名称
 from
@@ -37,7 +31,6 @@ from
 /*
 800 内部关联交易合同入库
 */
-
 select
   rkd.warehouse_entry_order_sn,
   FROM_UNIXTIME(rkd.create_time, '%Y-%m-%d') rkrq,
@@ -58,9 +51,7 @@ where rkd.warehouse_entry_order_id = rkdi.warehouse_entry_order_id
   -- and rkd.internal_contract_id = jy.id 
 
  
-
-  and rkd.type = 800
-
+and rkd.type = 800
 /*
   100 '采购入库' 采购入库的有可能 be_batch 不存在采购单号
 select * from be_warehouse_entry_order_storage where warehouse_entry_order_id = '1-f028262c-9dcd-11e6-b65e-00163e003432' ;
@@ -87,7 +78,7 @@ select
 from
     be_warehouse_entry_order rkd
   LEFT JOIN be_warehouse_entry_order_goods rkdi on rkdi.warehouse_entry_order_id = rkd.warehouse_entry_order_id
-  LEFT JOIN be_arrival_prediction_order apo on apo.arrival_prediction_order_sn = rkdi.from_order_sn and rkdi.from_order_type = 'arrival_prediction_order'
+  LEFT JOIN be_arrival_prediction_order apo on apo.arrival_prediction_order_sn = rkdi.from_order_sn and rkdi.from_order_type = 'arrival_prediction_order' AND apo.`status` != -100
   LEFT JOIN be_purchase_order pur on pur.purchase_order_sn = apo.purchase_order_sn
 where rkd.type = 100
 /*
@@ -116,11 +107,7 @@ where
   and rkd.warehouse_entry_order_id = rkdi.warehouse_entry_order_id
 ) w
 LEFT JOIN be_warehouse ck ON ck.warehouse_id = w.warehouse_id
-LEFT JOIN be_companys ca on ca.id 
-
- 
-
- = ck.company_id
-where
-  w.rkrq>='2018-05-10'
-  and w.rkrq<'2018-05-11'
+LEFT JOIN be_companys ca on ca.id = ck.company_id
+where 
+ w.rkrq>='2018-10-09'
+ AND w.rkrq<'2018-10-10'

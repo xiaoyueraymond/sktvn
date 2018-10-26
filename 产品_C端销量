@@ -1,0 +1,31 @@
+http://47.75.52.156:9200//ss_c_order/c_order/_search
+
+{
+  "size": 0, 
+  "query":{
+    "bool": {
+      "filter": [
+        {
+        "term":{
+          "sku": "AUBA001"
+        }
+        },
+        {
+        "range":{
+          "pay_time": {
+            "gte": "2018-05-29",
+            "lt": "2018-06-13"
+          }
+        }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "total": {
+      "sum": {"field": "quantity"}
+    }
+  }
+}
+
+

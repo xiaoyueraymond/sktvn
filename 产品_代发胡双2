@@ -1,0 +1,47 @@
+SELECT de.erp_orders_sn 内单号,
+er.orders_sn 外单号,
+er.transportion 物流单号,
+tr.transportion_sn 手动上传的物流单号,
+tr.create_time 上传时间,
+er.xingyun_order_no 代发商单号,
+de.id 出库单号,
+wa.id 入库单号 ,
+wa.sku SKU,
+C.item_count 数量,
+(d.daifa_item_price*C.item_count) 代发总价,
+wa.single_price 入库单价,
+warehouses.name 仓库名称,
+er.sales_account 分销商账号,
+er.orders_shipping_time 发货时间,
+CASE er.orders_status 
+WHEN 10 THEN
+'新建'
+WHEN 20 THEN
+'已打印'
+WHEN 30 THEN
+'核对出库'
+WHEN 40 THEN
+'扫描称重'
+WHEN 90 THEN
+'已取消'
+WHEN 100 THEN
+'已发货'
+END '订单状态',
+c.orders_sku SKU1,
+c.sku_name 中文名称,
+c.item_count 数量,
+c.actual_count 成交单价,
+d.daifa_item_price 代发表单价,
+d.daifa_express_code 代发物流公司,
+d.daifa_transportion_sn 代发表物流单号
+FROM deliveryorders de 
+LEFT JOIN erp_orders er ON de.erp_orders_sn=er.erp_orders_sn 
+LEFT JOIN warehouseorders wa ON de.id=wa. deliveryorders_id 
+LEFT JOIN transportion tr ON er.erp_orders_sn=tr.erp_orders_sn 
+LEFT JOIN deliveryorders b ON b.id = wa.deliveryorders_id 
+LEFT JOIN erp_order_products c on c.id = b.orders_products_id
+LEFT JOIN erp_order_products_daifa_detail d on d.erp_order_product_id = c.id
+LEFT JOIN warehouses ON warehouses.id=er.warehouse_id
+where de.erp_orders_sn in(
+)
+

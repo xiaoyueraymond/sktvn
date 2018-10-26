@@ -1,0 +1,9 @@
+UPDATE `warehouseorders` SET single_price='"&F2&"',tax_singe_price='"&F2&"',money='"&G2&"',cost='"&G2&"' WHERE id='"&B2&"' AND sku='THPH001' AND warehouse_id='"&C2&"';
+
+入库单id
+
+="UPDATE `warehouseorders` SET single_price='"&F2&"',tax_singe_price='"&F2&"',money='"&G2&"',cost='"&G2&"' WHERE id='"&B2&"' AND sku='THPH001' AND warehouse_id='"&C2&"';"
+
+="SELECT `purchaseorder_id` 采购单号,`warehouse_quantity` 数量 FROM `warehouseorders` WHERE `sku` = '"&C2&"' AND `warehouse_id` = '"&B2&"' AND `purchaseorder_id`!=0 UNION ALL"
+
+="UPDATE `internal_contracts_skus` SET unit_price='"&C2&"',total_price='"&D2&"' WHERE id='"&E2&"';"

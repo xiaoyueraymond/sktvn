@@ -12,7 +12,7 @@
         <input type="file" name="file" accept=".csv">
         <button type="submit" class="btn btn-default">Submit</button>
     </div>
-    <div><p>出入库下载</p><a href="http://192.168.8.59/download/">download</a></div>
+    <div><p>出入库下载</p><a href="http://192.168.8.57/download/">download</a></div>
     
 </form>
 </body>
@@ -37,7 +37,7 @@ if($_FILES){
 	$str = join(",",$list);
 	$ids = "'".str_replace(",","','",$str)."'";
 
-	$mysqli = mysqli_connect('数据库地址', '用户名', '密码', '数据库');
+	$mysqli = mysqli_connect('j6ch7qp1xe6f4z02kgo.mysql.rds.aliyuncs.com', 'finance_java', '7b@0cB8D5929D5d', 'newerp');
 	$sql = "SELECT a.id ,a.sku ,c.item_count ,d.daifa_item_price ,(d.daifa_item_price/C.item_count) 单价 FROM warehouseorders a 
 			LEFT JOIN deliveryorders b ON b.id = a.deliveryorders_id 
 			LEFT JOIN erp_order_products c ON c.id = b.orders_products_id

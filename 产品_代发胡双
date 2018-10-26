@@ -1,0 +1,37 @@
+SELECT CONCAT("'",c.erp_orders_sn) 内单号,
+CONCAT("'",b.xingyun_order_no) 代发单号,
+d.name 仓库名称,
+c.sales_account 分销商账号,
+c.orders_shipping_time 发货时间,
+CASE c.orders_status 
+WHEN 10 THEN
+'新建'
+WHEN 20 THEN
+'已打印'
+WHEN 30 THEN
+'核对出库'
+WHEN 40 THEN
+'扫描称重'
+WHEN 90 THEN
+'已取消'
+WHEN 100 THEN
+'已发货'
+END '订单状态',
+b.orders_sku SKU,
+b.sku_name 中文名称,
+b.item_count 数量,
+b.actual_count 成交单价,
+a.daifa_item_price 代发单价,
+a.daifa_express_code 物流公司,
+a.daifa_transportion_sn 物流单号
+FROM erp_order_products b                                                                  
+LEFT JOIN erp_order_products_daifa_detail a ON a.erp_order_product_id=b.id
+LEFT JOIN erp_orders c ON c.erp_orders_sn=b.erp_orders_sn
+LEFT JOIN warehouses d ON d.id=c.warehouse_id
+WHERE c.orders_export_time >='2018-10-01'
+AND c.orders_export_time <'2018-10-30'
+AND c.warehouse_id  in (511,515)
+
+#仓库ID,warehouse,唯妮511,515 ，时间参数'2018-07-01'
+行云192 529
+海带460 476

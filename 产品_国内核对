@@ -1,0 +1,36 @@
+-- 带仓库
+SELECT 
+    CKID,W.NAME 
+
+,sku,
+    SUM(qcsl) 期初数量,    SUM(rksl) 入库数量,    SUM(cksl)*-1 出库数量,    SUM(qmsl) 期末数量,
+    SUM(qcsl) + SUM(rksl) - SUM(cksl) - SUM(qmsl) 差异
+FROM
+    (
+    -- 期末
+    SELECT      warehouse_id CKID,v.sku sku, SUM(v.quantity) qmsl, 0 rksl, 0 cksl, 0 qcsl
+    FROM        inventories v
+    WHERE        `inventory_date` = '2018-10-01'
+    GROUP BY warehouse_id,v.sku 
+    -- 出库
+    UNION ALL 
+    SELECT      warehouse_id CKID,sku, 0 qmsl, 0 rksl, SUM(quantity) cksl, 0 qcsl
+    FROM        deliveryorders
+    WHERE        op_time < '2018-10-01'
+            AND op_time >= '2018-09-01'
+    GROUP BY warehouse_id,sku 
+    -- 入库
+    UNION ALL 
+    SELECT      warehouse_id CKID,w.`sku` sku,0 qmsl, SUM(w.`warehouse_quantity`) rksl, 0 cksl,0 qcsl
+    FROM        `warehouseorders` w
+    WHERE        op_time < '2018-10-01'
+            AND op_time >= '2018-09-01'
+    GROUP BY warehouse_id,w.sku 
+    UNION ALL 
+    -- 期初
+    SELECT      warehouse_id CKID,v.sku sku, 0 qmsl, 0 rksl, 0 cksl, SUM(v.quantity) qcsl
+    FROM        inventories v
+    WHERE        `inventory_date` = '2018-09-01'
+    GROUP BY warehouse_id,v.sku) A,WAREHOUSES W where A.CKID = W.ID AND W.international =0
+GROUP BY CKID,W.NAME ,sku
+#HAVING SUM(qcsl) + SUM(rksl) - SUM(cksl) - SUM(qmsl) <> 0

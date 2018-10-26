@@ -1,0 +1,17 @@
+ SELECT sku,companys.cn_name,sum(`amount`) FROM `storage_sku` JOIN companys on companys.id 
+
+ =storage_sku.company_id WHERE `ware_id`=179 GROUP BY sku,company_id
+
+ HT-深圳华南城退货自营仓 179
+
+ UPDATE Person SET FirstName = 'Fred' WHERE LastName = 'Wilson'
+
+ update warehouseorders set company_id ='13' where id ='241600';
+ update  storage_sku set company_id ='13' where id ='99121';
+
+ 13 深圳市维康氏电子商务有限公司
+
+
+SELECT * FROM `storage_sku` WHERE `sku` LIKE 'DKAR021' AND `ware_id` = 179
+
+

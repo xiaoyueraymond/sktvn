@@ -1,0 +1,28 @@
+HT-欧洲区德国杜伊斯堡订单执行仓 `ware_id`=92
+ 
+ newerp库 warehouses"仓库资料表"
+ newerp库 companys"主体公司基础资料"
+
+ SELECT sku,companys.cn_name,sum(`amount`) FROM `storage_sku` JOIN companys on companys.id 
+
+ =storage_sku.company_id WHERE `ware_id`=133 GROUP BY sku,company_id
+
+数据库: newerp »表: warehouses"仓库资料表" 133
+SZHT-东莞常平一般贸易仓
+HT-欧洲德国杜伊斯堡直邮自营仓	 92
+
+'KOSY003',
+'KOSY004',
+'IDBS001',
+'IDBS002',
+'IDBS003',
+'IDBS004',
+'IDBS005',
+'IDBS006',
+'AMST310',
+'AMST312',
+'AMST318',
+'AMST322',
+'AMST323',
+'AMST324',
+'AMST325',

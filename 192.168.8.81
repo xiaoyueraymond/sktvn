@@ -1,0 +1,39 @@
+192.168.8.81 root1 123456
+
+https://www.cnblogs.com/yaochc/p/4931979.html
+
+ubuntu 安装VPN
+https://www.jianshu.com/p/616376a4ea5f
+
+去捐赠https://www.youtube.com/watch?v=8-V0eonlpD8
+
+1. Download and Install
+1.1 https://www.visualstudio.com/downloads/
+1.2 https://cmake.org/download/
+1.3 https://developer.nvidia.com/cuda-dow...
+
+XMR-Stak
+https://github.com/fireice-uk/xmr-sta...
+https://github.com/fireice-uk/xmr-sta...
+
+2. Edit donate-level.h
+2.1 Run "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsMSBuildCmd.bat"
+2.3 set CMAKE_PREFIX_PATH=C:\Users\Administrator\Desktop\xmr-stak-dep\hwloc;C:\Users\Administrator\Desktop\xmr-stak-dep\libmicrohttpd;C:\Users\Administrator\Desktop\xmr-stak-dep\openssl
+2.5 mkdir build
+2.6 cd build
+2.7 cmake -G "Visual Studio 15 2017 Win64" -T v141,host=x64 ..
+2.8 cmake --build . --config Release --target install
+2.9 Copy xmr-stak-dep\openssl\bin\*  To  xmr-stak-cpu-final\build\bin\Release
+
+
+XMRIG
+https://github.com/xmrig/xmrig-deps/r...
+https://github.com/xmrig/xmrig/releases
+
+安装cmake 给所有用户添加，添加环境变量
+Edit donate.h
+mkdir build
+cd build
+cmake .. -G "Visual Studio 15 2017 Win64" -DXMRIG_DEPS=C:\Users\Administrator\Desktop\xmrig-deps-3.3\msvc2017\x64
+cmake --build . --config Release
+

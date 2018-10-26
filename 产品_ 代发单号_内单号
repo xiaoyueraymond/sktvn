@@ -1,0 +1,40 @@
+SELECT 
+b.xingyun_order_no  代发单号,
+c.xingyun_order_no  代发单号,
+c.erp_orders_sn 内单号,
+b.sku_name 产品名字,
+c.transportion 物流单号,
+c.payment_info_id_card_number 身份证号,
+c.payment_info_name 姓名,
+c.buyer_phone 手机号码,
+b.orders_sku SKU,
+b.final_fee 总价,
+b.item_count 数量
+FROM erp_order_products b                                                                  
+LEFT JOIN erp_order_products_daifa_detail a ON a.erp_order_product_id=b.id
+LEFT JOIN erp_orders c ON c.erp_orders_sn=b.erp_orders_sn
+LEFT JOIN warehouses d ON d.id=c.warehouse_id
+WHERE  c.orders_export_time >='2018-10-01'
+AND c.orders_export_time <'2018-10-30'
+AND b.xingyun_order_no  in(
+'O15392301216882096',
+'O15392301217040087',
+'O15392301217206114',
+'OA55389791323540364',
+'OA55391356894485621',
+'OA55390670054584865',
+'OA55389791086690040',
+'OA55389027177060730',
+'OA55388787086975306')
+or c.xingyun_order_no
+ in(
+'O15392301216882096',
+'O15392301217040087',
+'O15392301217206114',
+'OA55389791323540364',
+'OA55391356894485621',
+'OA55390670054584865',
+'OA55389791086690040',
+'OA55389027177060730',
+'OA55388787086975306')
+

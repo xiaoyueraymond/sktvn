@@ -1,0 +1,45 @@
+SELECT mx.erp_orders_sn,mx.orders_shipping_time,pay.is_pay_tax FROM erp_orders mx LEFT JOIN erp_order_pay_taxes pay on mx.erp_orders_sn =pay.erp_orders_sn WHERE pay.is_pay_tax = 1  AND mx.orders_shipping_time < '2018-06-01' AND mx.orders_shipping_time >= '2018-05-01';
+
+
+#用内单号关联入库单号 出库单号
+SELECT de.erp_orders_sn 内单号,de.id 出库单号,wa.id 入库单号 FROM deliveryorders de LEFT JOIN warehouseorders wa ON de.id=wa. deliveryorders_id where de.erp_orders_sn in('77484327855')
+
+
+SELECT de.erp_orders_sn 内单号,er.orders_sn 外单号,er.transportion 物流单号,tr.transportion_sn 手动上传的物流单号,tr.create_time 上传时间,er.xingyun_order_no 行云单号,de.id 出库单号,wa.id 入库单号 FROM deliveryorders de 
+LEFT JOIN erp_orders er ON de.erp_orders_sn=er.erp_orders_sn LEFT JOIN warehouseorders wa ON de.id=wa. deliveryorders_id LEFT JOIN transportion tr ON er.erp_orders_sn=tr.erp_orders_sn where wa.id in(
+'172949')
+
+
+SELECT erp_orders_sn,orders_shipping_time,is_pay_tax FROM erp_orders WHERE is_pay_tax =1  AND orders_shipping_time < '2018-06-01' AND orders_shipping_time >= '2018-05-01';
+
+
+SELECT erp_orders_sn,orders_shipping_time,is_pay_tax FROM erp_orders WHERE erp_orders_sn=''
+
+SELECT erp_orders_sn,orders_shipping_time,is_pay_tax FROM erp_orders WHERE orders_shipping_time < '2018-06-01' AND orders_shipping_time >= '2018-05-01';
+
+#获取物流单号
+SELECT erp_orders_sn,transportion,rders_shipping_time from erp_orders WHERE erp_orders_sn in(
+'VIP1806250000111',
+'VIP1806250000110',
+'VIP1806240000242',
+'VIP1806240000241',
+'VIP1806250001451',
+'VIP1806190001552',
+'VIP1806190001544',
+'VIP1806190001542',
+'VIP1806190001510',
+'VIP1806190001509',
+'VIP1806190001389',
+'VIP1806190001371',
+'VIP1806190001366',
+'VIP1806190001339',
+'VIP1806190002362')
+
+
+="SELECT `purchaseorder_id` 采购单号,`warehouse_quantity` 数量 FROM `warehouseorders` WHERE `sku` = '"&C2&"' AND `warehouse_id` = '"&B2&"' AND `purchaseorder_id`!=0 UNION ALL"
+
+
+
+="UPDATE `warehouseorders` SET single_price='"&D2&"',tax_singe_price='"&D2&"',money='"&D2&"',cost='"&D2&"' WHERE id='"&C2&"';"
+
+=VLOOKUP(B1613,内单号_入库单号1!A:B,2,0)
